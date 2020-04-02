@@ -35,7 +35,7 @@
 
 ###  Построение сети и загрузка настроек устройств
 
-Конфигурация коммутатора S1:
+**Конфигурация коммутатора S1:**
 
 hostname S1
 interface range f0/1-24, g0/1-2
@@ -77,7 +77,7 @@ interface port-channel 2
 switchport trunk native vlan 99
 switchport mode access
 
-Конфигурация коммутатора S2:
+**Конфигурация коммутатора S2:**
 
 hostname S2
 interface range f0/1-24, g0/1-2
@@ -117,7 +117,7 @@ switchport trunk native vlan 99
 switchport trunk allowed vlan 1,10,99
 switchport mode trunk
 
-Конфигурация коммутатора S3:
+**Конфигурация коммутатора S3:**
 
 hostname S3
 interface range f0/1-24, g0/1-2
@@ -164,15 +164,21 @@ switchport mode trunk
 Исправим это :
 
 S1(config)# 
-interface port-channel 1
-switchport mode trunk
-switchport  trunk native vlan 99
 interface port-channel 2
 switchport mode trunk
-switchport  trunk native vlan 99 
+
+interface range f0/1-2
+no channel-group 1 mode active
+
+no interface port-channel 1
 
 int r f0/1-2
-channel-group 1 mode auto 
+channel-group 1 mode auto
+
+interface port-channel 1
+switchport mode trunk
+switchport trunk native vlan 99
+switchport trunk allowed vlan 1,10
 
 
 
