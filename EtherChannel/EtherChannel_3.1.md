@@ -76,10 +76,7 @@ vlan 10 <br/>name Staff <br/>
 
 Настроим порты коммутатора с присоединёнными узлами в качестве портов доступа в сети VLAN 10: 
 
-int ran e0/1-3<br/>
-sw m ac<br/>
-int ran e1/0-3<br/>
-sw m ac<br/>
+
 int e0/0<br/>
 sw m ac<br/>
 sw ac vl 10<br/>
