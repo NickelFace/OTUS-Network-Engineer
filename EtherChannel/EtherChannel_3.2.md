@@ -4,7 +4,7 @@
 
 ### Топология
 
-![image-20200329014015322](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20200329014015322.png)
+![img](img/21.png)
 
 
 
@@ -114,7 +114,7 @@ switchport trunk native vlan 99
 switchport trunk allowed vlan 1,99
 interface port-channel 3
 switchport trunk native vlan 99
-switchport trunk allowed vlan 1,10,99
+switchport trunk allowed vlan 1,10,99,99
 switchport mode trunk
 
 Конфигурация коммутатора S3:
@@ -150,8 +150,8 @@ no shutdown
 interface vlan 99
 ip address 192.168.1.13 255.255.255.0
 interface port-channel 3
-switchport trunk native vlan 99
-switchport mode trunk
+no switchport trunk native vlan 99
+no switchport mode trunk
 
 Шаг 1:   Выполните поиск и устранение неполадок в работе маршрутизатора S1.
 
@@ -161,39 +161,88 @@ switchport mode trunk
 
 ![image-20200331234929141](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20200331234929141.png)
 
+S1(config-if)# **do show run | begin interface Port-channel**  - на 2 группе каналов стоит режим доступа
+
 Исправим это :
 
 S1(config)# 
-interface port-channel 1
-switchport mode trunk
-switchport  trunk native vlan 99
+
 interface port-channel 2
 switchport mode trunk
-switchport  trunk native vlan 99 
+switchport trunk allowed vlan 1,10,99
 
-int r f0/1-2
+no interface port-channel 1
+interface port-channel 1
+switchport mode trunk
+switchport trunk native vlan 99
+switchport trunk allowed vlan 1,10,99
+
+interface range fastEthernet 0/1-2
 channel-group 1 mode auto 
 
+Шаг 2:   Выполните поиск и устранение неполадок в работе маршрутизатора S2.
+
+![image-20200403214304361](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20200403214304361.png)
+
+S2(config)#interface port-channel 1
+no switchport trunk allowed vlan 1,99
+switchport trunk allowed vlan 1,10,99
+
+interface port-channel 3
+no switchport trunk allowed vlan 1,10,99,99
+switchport trunk allowed vlan 1,10,99
+
+interface range fastEthernet 0/3-4
+no shutdown 
+
+Шаг 3:   Выполните поиск и устранение неполадок в работе маршрутизатора S3.
+
+На 3 перепутаны процессы PAgP и отсутствуют настройки на interface range fastEthernet 0/1-2
+Так что переделаем все заново настройки .
+
+interface range fastEthernet 0/3-4
+no channel-group 3 mode desirable
+no switchport trunk native vlan 99
+no switchport mode trunk
+
+interface range fastEthernet 0/1-2
+channel-group 3 mode auto 
+
+interface port-channel 3
+switchport mode trunk
+switchport trunk native vlan 99
+switchport trunk allowed vlan 1,10,99
+
+interface range fastEthernet 0/3-4
+ channel-group 2 mode auto
+
+interface port-channel 2
+switchport mode trunk
+switchport trunk native vlan 99
+switchport trunk allowed vlan 1,10,99
 
 
-c.   Используйте команду **show run | begin interface Port-channel** для просмотра текущей конфигурации, начиная с первого интерфейса агрегированного канала.
+
+Шаг 4: Проверка связности коммутаторов S1, S2, S3 и  ПК А , ПК С.
+
+При проверке ,оказалось, что ping не проходят , тогда я выключил  interface vlan 1 и поднял 99.
+После проделанных манипуляций, всё заработало. Чтобы не городить огород из скриншотов ,покажу логи за S3.
+
+![img](img/22.png)s
+
+Ping с ПК А на С тоже идут ,  а это значит, что с задачей справился.
+
+![img](img/ping.png)
 
 
 
 
 
-d.  Устраните все ошибки, найденные в выходных данных из предыдущих команд **show**. Запишите команды, используемые для исправления конфигураций.
 
-____________________________________________________________________________________
 
-____________________________________________________________________________________
 
-____________________________________________________________________________________
 
-____________________________________________________________________________________
 
-____________________________________________________________________________________
 
-____________________________________________________________________________________
 
 
