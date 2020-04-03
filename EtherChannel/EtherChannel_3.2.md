@@ -35,7 +35,7 @@
 
 ###  Построение сети и загрузка настроек устройств
 
-Конфигурация коммутатора S1:
+**Конфигурация коммутатора S1:**
 
 hostname S1
 interface range f0/1-24, g0/1-2
@@ -77,7 +77,7 @@ interface port-channel 2
 switchport trunk native vlan 99
 switchport mode access
 
-Конфигурация коммутатора S2:
+**Конфигурация коммутатора S2:**
 
 hostname S2
 interface range f0/1-24, g0/1-2
@@ -117,7 +117,7 @@ switchport trunk native vlan 99
 switchport trunk allowed vlan 1,10,99,99
 switchport mode trunk
 
-Конфигурация коммутатора S3:
+**Конфигурация коммутатора S3:**
 
 hostname S3
 interface range f0/1-24, g0/1-2
@@ -159,13 +159,14 @@ no switchport mode trunk
 
 **show etherchannel summary** - указывает настроенный LACP, что противоречит условию
 
-![image-20200331234929141](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20200331234929141.png)
+![img](img/24.png)
 
 S1(config-if)# **do show run | begin interface Port-channel**  - на 2 группе каналов стоит режим доступа
 
 Исправим это :
 
 S1(config)# 
+<<<<<<< HEAD
 
 interface port-channel 2
 switchport mode trunk
@@ -182,7 +183,7 @@ channel-group 1 mode auto
 
 Шаг 2:   Выполните поиск и устранение неполадок в работе маршрутизатора S2.
 
-![image-20200403214304361](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20200403214304361.png)
+![img](img/23.png)
 
 S2(config)#interface port-channel 1
 no switchport trunk allowed vlan 1,99
@@ -220,6 +221,24 @@ interface port-channel 2
 switchport mode trunk
 switchport trunk native vlan 99
 switchport trunk allowed vlan 1,10,99
+
+=======
+interface port-channel 2
+switchport mode trunk
+
+interface range f0/1-2
+no channel-group 1 mode active
+
+no interface port-channel 1
+
+int r f0/1-2
+channel-group 1 mode auto
+
+interface port-channel 1
+switchport mode trunk
+switchport trunk native vlan 99
+switchport trunk allowed vlan 1,10
+
 
 
 
