@@ -37,123 +37,123 @@
 
 **Конфигурация коммутатора S1:**
 
-hostname S1
-interface range f0/1-24, g0/1-2
-shutdown
-exit
-enable secret class
-no ip domain lookup
-line vty 0 15
-password cisco
-login
-line con 0
-password cisco
-logging synchronous
-login
-exit
-vlan 10
-name User
-vlan 99
-Name Management
-interface range f0/1-2
-switchport mode trunk
-channel-group 1 mode active
-switchport trunk native vlan 99
-no shutdown
-interface range f0/3-4
-channel-group 2 mode desirable
-switchport trunk native vlan 99
-no shutdown
-interface f0/6
-switchport mode access
-switchport access vlan 10
-no shutdown
-interface vlan 99
-ip address 192.168.1.11 255.255.255.0
-interface port-channel 1
-switchport trunk native vlan 99
-switchport mode trunk
-interface port-channel 2
-switchport trunk native vlan 99
-switchport mode access
+hostname S1<br/>
+interface range f0/1-24, g0/1-2<br/>
+shutdown<br/>
+exit<br/>
+enable secret class<br/>
+no ip domain lookup<br/>
+line vty 0 15<br/>
+password cisco<br/>
+login<br/>
+line con 0<br/>
+password cisco<br/>
+logging synchronous<br/>
+login<br/>
+exit<br/>
+vlan 10<br/>
+name User<br/>
+vlan 99<br/>
+Name Management<br/>
+interface range f0/1-2<br/>
+switchport mode trunk<br/>
+channel-group 1 mode active<br/>
+switchport trunk native vlan 99<br/>
+no shutdown<br/>
+interface range f0/3-4<br/>
+channel-group 2 mode desirable<br/>
+switchport trunk native vlan 99<br/>
+no shutdown<br/>
+interface f0/6<br/>
+switchport mode access<br/>
+switchport access vlan 10<br/>
+no shutdown<br/>
+interface vlan 99<br/>
+ip address 192.168.1.11 255.255.255.0<br/>
+interface port-channel 1<br/>
+switchport trunk native vlan 99<br/>
+switchport mode trunk<br/>
+interface port-channel 2<br/>
+switchport trunk native vlan 99<br/>
+switchport mode access<br/>
 
 **Конфигурация коммутатора S2:**
 
-hostname S2
-interface range f0/1-24, g0/1-2
-shutdown
-exit
-enable secret class
-no ip domain lookup
-line vty 0 15
-password cisco
-login
-line con 0
-password cisco
-logging synchronous
-login
-exit
-vlan 10
-name User
-vlan 99
-name Management
-spanning-tree vlan 1,10,99 root primary
-interface range f0/1-2
-switchport mode trunk
-channel-group 1 mode desirable
-switchport trunk native vlan 99
-no shutdown
-interface range f0/3-4
-switchport mode trunk
-channel-group 3 mode desirable
-switchport trunk native vlan 99
-interface vlan 99
-ip address 192.168.1.12 255.255.255.0
-interface port-channel 1
-switchport trunk native vlan 99
-switchport trunk allowed vlan 1,99
-interface port-channel 3
-switchport trunk native vlan 99
-switchport trunk allowed vlan 1,10,99,99
-switchport mode trunk
+hostname S2<br/>
+interface range f0/1-24, g0/1-2<br/>
+shutdown<br/>
+exit<br/>
+enable secret class<br/>
+no ip domain lookup<br/>
+line vty 0 15<br/>
+password cisco<br/>
+login<br/>
+line con 0<br/>
+password cisco<br/>
+logging synchronous<br/>
+login<br/>
+exit<br/>
+vlan 10<br/>
+name User<br/>
+vlan 99<br/>
+name Management<br/>
+spanning-tree vlan 1,10,99 root primary<br/>
+interface range f0/1-2<br/>
+switchport mode trunk<br/>
+channel-group 1 mode desirable<br/>
+switchport trunk native vlan 99<br/>
+no shutdown<br/>
+interface range f0/3-4<br/>
+switchport mode trunk<br/>
+channel-group 3 mode desirable<br/>
+switchport trunk native vlan 99<br/>
+interface vlan 99<br/>
+ip address 192.168.1.12 255.255.255.0<br/>
+interface port-channel 1<br/>
+switchport trunk native vlan 99<br/>
+switchport trunk allowed vlan 1,99<br/>
+interface port-channel 3<br/>
+switchport trunk native vlan 99<br/>
+switchport trunk allowed vlan 1,10,99,99<br/>
+switchport mode trunk<br/>
 
 **Конфигурация коммутатора S3:**
 
-hostname S3
-interface range f0/1-24, g0/1-2
-shutdown
-exit
-enable secret class
-no ip domain lookup
-line vty 0 15
-password cisco
-login
-line con 0
-password cisco
-logging synchronous
-login
-exit
-vlan 10
-name User
-vlan 99
-name Management
-interface range f0/1-2
-interface range f0/3-4
-switchport mode trunk
-channel-group 3 mode desirable
-switchport trunk native vlan 99
-no shutdown
-interface f0/18
-switchport mode access
-switchport access vlan 10
-no shutdown
-interface vlan 99
-ip address 192.168.1.13 255.255.255.0
-interface port-channel 3
-no switchport trunk native vlan 99
-no switchport mode trunk
+hostname S3<br/>
+interface range f0/1-24, g0/1-2<br/>
+shutdown<br/>
+exit<br/>
+enable secret class<br/>
+no ip domain lookup<br/>
+line vty 0 15<br/>
+password cisco<br/>
+login<br/>
+line con 0<br/>
+password cisco<br/>
+logging synchronous<br/>
+login<br/>
+exit<br/>
+vlan 10<br/>
+name User<br/>
+vlan 99<br/>
+name Management<br/>
+interface range f0/1-2<br/>
+interface range f0/3-4<br/>
+switchport mode trunk<br/>
+channel-group 3 mode desirable<br/>
+switchport trunk native vlan 99<br/>
+no shutdown<br/>
+interface f0/18<br/>
+switchport mode access<br/>
+switchport access vlan 10<br/>
+no shutdown<br/>
+interface vlan 99<br/>
+ip address 192.168.1.13 255.255.255.0<br/>
+interface port-channel 3<br/>
+no switchport trunk native vlan 99<br/>
+no switchport mode trunk<br/>
 
-Шаг 1:   Выполните поиск и устранение неполадок в работе маршрутизатора S1.
+#### Шаг 1:   Выполните поиск и устранение неполадок в работе маршрутизатора S1.
 
 **show interfaces trunk** - команда пустая ,а это значит не в одну сторону не настроены trunk порты
 
@@ -168,81 +168,76 @@ S1(config-if)# **do show run | begin interface Port-channel**  - на 2 груп
 S1(config)# 
 <<<<<<< HEAD
 
-interface port-channel 2
-switchport mode trunk
-switchport trunk allowed vlan 1,10,99
+interface port-channel 2<br/>
+switchport mode trunk<br/>
+switchport trunk allowed vlan 1,10,99<br/>
 
-no interface port-channel 1
-interface port-channel 1
-switchport mode trunk
-switchport trunk native vlan 99
-switchport trunk allowed vlan 1,10,99
+no interface port-channel 1<br/>
+interface port-channel 1<br/>
+switchport mode trunk<br/>
+switchport trunk native vlan 99<br/>
+switchport trunk allowed vlan 1,10,99<br/>
 
-interface range fastEthernet 0/1-2
-channel-group 1 mode auto 
+interface range fastEthernet 0/1-2<br/>
+channel-group 1 mode auto <br/>
 
-Шаг 2:   Выполните поиск и устранение неполадок в работе маршрутизатора S2.
+#### Шаг 2:   Выполните поиск и устранение неполадок в работе маршрутизатора S2.
 
 ![img](img/23.png)
 
-S2(config)#interface port-channel 1
-no switchport trunk allowed vlan 1,99
-switchport trunk allowed vlan 1,10,99
+S2(config)#interface port-channel 1<br/>
+no switchport trunk allowed vlan 1,99<br/>
+switchport trunk allowed vlan 1,10,99<br/>
 
-interface port-channel 3
-no switchport trunk allowed vlan 1,10,99,99
-switchport trunk allowed vlan 1,10,99
+interface range fastEthernet 0/3-4<br/>
+no shutdown <br/>
 
-interface range fastEthernet 0/3-4
-no shutdown 
+#### Шаг 3:   Выполните поиск и устранение неполадок в работе маршрутизатора S3.
 
-Шаг 3:   Выполните поиск и устранение неполадок в работе маршрутизатора S3.
-
-На 3 перепутаны процессы PAgP и отсутствуют настройки на interface range fastEthernet 0/1-2
+На 3 перепутаны процессы PAgP и отсутствуют настройки на interface range fastEthernet 0/1-2<br/> 
 Так что переделаем все заново настройки .
 
-interface range fastEthernet 0/3-4
-no channel-group 3 mode desirable
-no switchport trunk native vlan 99
-no switchport mode trunk
+interface range fastEthernet 0/3-4<br/>
+no channel-group 3 mode desirable<br/>
+no switchport trunk native vlan 99<br/>
+no switchport mode trunk<br/>
 
-interface range fastEthernet 0/1-2
-channel-group 3 mode auto 
+interface range fastEthernet 0/1-2<br/>
+channel-group 3 mode auto <br/>
 
-interface port-channel 3
-switchport mode trunk
-switchport trunk native vlan 99
-switchport trunk allowed vlan 1,10,99
+interface port-channel 3<br/>
+switchport mode trunk<br/>
+switchport trunk native vlan 99<br/>
+switchport trunk allowed vlan 1,10,99<br/>
 
-interface range fastEthernet 0/3-4
- channel-group 2 mode auto
+interface range fastEthernet 0/3-4<br/>
+ channel-group 2 mode auto<br/>
 
-interface port-channel 2
-switchport mode trunk
-switchport trunk native vlan 99
-switchport trunk allowed vlan 1,10,99
-
-=======
-interface port-channel 2
-switchport mode trunk
-
-interface range f0/1-2
-no channel-group 1 mode active
-
-no interface port-channel 1
-
-int r f0/1-2
-channel-group 1 mode auto
-
-interface port-channel 1
-switchport mode trunk
-switchport trunk native vlan 99
-switchport trunk allowed vlan 1,10
+interface port-channel 2<br/>
+switchport mode trunk<br/>
+switchport trunk native vlan 99<br/>
+switchport trunk allowed vlan 1,10,99<br/>
 
 
+interface port-channel 2<br/>
+switchport mode trunk<br/>
+
+interface range f0/1-2<br/>
+no channel-group 1 mode active<br/>
+
+no interface port-channel 1<br/>
+
+int r f0/1-2<br/>
+channel-group 1 mode auto<br/>
+
+interface port-channel 1<br/>
+switchport mode trunk<br/>
+switchport trunk native vlan 99<br/>
+switchport trunk allowed vlan 1,10<br/>
 
 
-Шаг 4: Проверка связности коммутаторов S1, S2, S3 и  ПК А , ПК С.
+
+#### Шаг 4: Проверка связности коммутаторов S1, S2, S3 и  ПК А , ПК С.
 
 При проверке ,оказалось, что ping не проходят , тогда я выключил  interface vlan 1 и поднял 99.
 После проделанных манипуляций, всё заработало. Чтобы не городить огород из скриншотов ,покажу логи за S3.
