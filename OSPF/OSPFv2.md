@@ -243,7 +243,7 @@ R1# **clear ip ospf process** <br/>
 
 ![image-20200404222130777]( img/11.png)
 
-![image-20200404222054932](C:/Users/Admin/AppData/Roaming/Typora/typora-user-images/image-20200404222054932.png)
+![image-20200404222054932](img/1112.png)
 
 
 
