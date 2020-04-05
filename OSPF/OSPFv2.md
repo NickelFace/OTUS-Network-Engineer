@@ -43,121 +43,121 @@
 
 **R1**
 
-enable
-conf t
-hos R1
+enable<br/>
+conf t<br/>
+hos R1<br/>
 
-no ip domain-lookup
-enable secret class 
-line vty 0 4 
-logging synchronous 
-password cisco 
-login 
-exit 
-line con 0 
-logging synchronous 
-password cisco 
-login 
-exit 
-Banner motd "This is a secure system. Authorized Access Only!"
+no ip domain-lookup<br/>
+enable secret class <br/>
+line vty 0 4 <br/>
+logging synchronous <br/>
+password cisco <br/>
+login <br/>
+exit <br/>
+line con 0 <br/>
+logging synchronous <br/>
+password cisco <br/>
+login <br/>
+exit <br/>
+Banner motd "This is a secure system. Authorized Access Only!"<br/>
 
-int gi7/0
-ip addr 192.168.1.1 255.255.255.0
-no shut
-exit
-int se8/0
- clock rate 128000 
-ip addr 192.168.12.1 255.255.255.252
-no shut
-exit
-int se9/0
-ip addr 192.168.13.1 255.255.255.252
-no shut
-exit
-line con 0
-exec-t 0 0
-exit
-do copy run start
-[Enter]
+int gi7/0<br/>
+ip addr 192.168.1.1 255.255.255.0<br/>
+no shut<br/>
+exit<br/>
+int se8/0<br/>
+ clock rate 128000 <br/>
+ip addr 192.168.12.1 255.255.255.252<br/>
+no shut<br/>
+exit<br/>
+int se9/0<br/>
+ip addr 192.168.13.1 255.255.255.252<br/>
+no shut<br/>
+exit<br/>
+line con 0<br/>
+exec-t 0 0<br/>
+exit<br/>
+do copy run start<br/>
+[Enter]<br/>
 
 **R2**
 
-en
-conf t
-hos R2
+en<br/>
+conf t<br/>
+hos R2<br/>
 
-no ip domain-lookup
-enable secret class 
-line vty 0 4 
-logging synchronous 
-password cisco 
-login 
-exit 
-line con 0 
-logging synchronous 
-password cisco 
-login 
-exit 
-Banner motd "This is a secure system. Authorized Access Only!"
+no ip domain-lookup<br/>
+enable secret class <br/>
+line vty 0 4 <br/>
+logging synchronous <br/>
+password cisco <br/>
+login <br/>
+exit <br/>
+line con 0 <br/>
+logging synchronous <br/>
+password cisco <br/>
+login <br/>
+exit <br/>
+Banner motd "This is a secure system. Authorized Access Only!"<br/>
 
-no ip domain-lookup
-int se8/0
-ip addr 192.168.12.2 255.255.255.252
-no shut
-exit
-int se9/0
- clock rate 128000 
-ip addr 192.168.23.1 255.255.255.252
-no shut
-exit
-int gi 7/0
-ip addr 192.168.2.1 255.255.255.0
-no shut
-exit
-line con 0
-exec-t 0 0
-exit
-do copy run start
-[Enter]
+no ip domain-lookup<br/>
+int se8/0<br/>
+ip addr 192.168.12.2 255.255.255.252<br/>
+no shut<br/>
+exit<br/>
+int se9/0<br/>
+ clock rate 128000 <br/>
+ip addr 192.168.23.1 255.255.255.252<br/>
+no shut<br/>
+exit<br/>
+int gi 7/0<br/>
+ip addr 192.168.2.1 255.255.255.0<br/>
+no shut<br/>
+exit<br/>
+line con 0<br/>
+exec-t 0 0<br/>
+exit<br/>
+do copy run start<br/>
+[Enter]<br/>
 
 **R3**
 
-ena
-conf t
-hos R3
+ena<br/>
+conf t<br/>
+hos R3<br/>
 
-no ip domain-lookup
-enable secret class 
-line vty 0 4 
-logging synchronous 
-password cisco 
-login 
-exit 
-line con 0 
-logging synchronous 
-password cisco 
-login 
-exit 
-Banner motd "This is a secure system. Authorized Access Only!"
+no ip domain-lookup<br/>
+enable secret class <br/>
+line vty 0 4 <br/>
+logging synchronous <br/>
+password cisco <br/>
+login <br/>
+exit <br/>
+line con 0 <br/>
+logging synchronous <br/>
+password cisco <br/>
+login <br/>
+exit <br/>
+Banner motd "This is a secure system. Authorized Access Only!"<br/>
 
-int se8/0
- clock rate 128000 
-ip addr 192.168.13.2 255.255.255.252
-no shut
-exit
-int se 9/0
-ip addr 192.168.23.2 255.255.255.252
-no shut
-exit
-int gi7/0
-ip addr 192.168.3.1 255.255.255.0
-no shut
-exit
-line con 0
-exec-t 0 0
-exit
-do copy run start
-[Enter]
+int se8/0<br/>
+ clock rate 128000 <br/>
+ip addr 192.168.13.2 255.255.255.252<br/>
+no shut<br/>
+exit<br/>
+int se 9/0<br/>
+ip addr 192.168.23.2 255.255.255.252<br/>
+no shut<br/>
+exit<br/>
+int gi7/0<br/>
+ip addr 192.168.3.1 255.255.255.0<br/>
+no shut<br/>
+exit<br/>
+line con 0<br/>
+exec-t 0 0<br/>
+exit<br/>
+do copy run start<br/>
+[Enter]<br/>
 
 ### Настройка и проверка маршрутизации OSPF
 
@@ -165,24 +165,24 @@ do copy run start
 
 R1
 
-router ospf 1
-network 192.168.1.0 0.0.0.255 area 0
-network 192.168.12.0 0.0.0.3 area 0
-network 192.168.13.0 0.0.0.3 area 0
+router ospf 1<br/>
+network 192.168.1.0 0.0.0.255 area 0<br/>
+network 192.168.12.0 0.0.0.3 area 0<br/>
+network 192.168.13.0 0.0.0.3 area 0<br/>
 
 R2
 
-router ospf 1
-network 192.168.2.0 0.0.0.255 area 0
-network 192.168.12.0 0.0.0.3 area 0
-network 192.168.23.0 0.0.0.3 area 0
+router ospf 1<br/>
+network 192.168.2.0 0.0.0.255 area 0<br/>
+network 192.168.12.0 0.0.0.3 area 0<br/>
+network 192.168.23.0 0.0.0.3 area 0<br/>
 
 R3
 
-router ospf 1
-network 192.168.3.0 0.0.0.255 area 0
-network 192.168.13.0 0.0.0.3 area 0
-network 192.168.23.0 0.0.0.3 area 0
+router ospf 1<br/>
+network 192.168.3.0 0.0.0.255 area 0<br/>
+network 192.168.13.0 0.0.0.3 area 0<br/>
+network 192.168.23.0 0.0.0.3 area 0<br/>
 
 Проверим информацию о соседних устройствах и маршрутизации OSPF
 
@@ -208,7 +208,7 @@ network 192.168.23.0 0.0.0.3 area 0
 
 ![image-20200404214254216]( img/7.png)
 
-**show ip ospf interface brief**  - Не реализован в Packet Tracer
+**show ip ospf interface brief**  - Не реализован в Packet Tracer<br/>
 
 **Show ip ospf interface**
 
@@ -220,9 +220,9 @@ Ping на все ПК
 
 ###   Изменение назначенных идентификаторов маршрутизаторов
 
-R1(config)# **interface lo0**
-R1(config-if)# **ip address 1.1.1.1 255.255.255.255**
-R1(config-if)# **end**
+R1(config)# **interface lo0**<br/>
+R1(config-if)# **ip address 1.1.1.1 255.255.255.255**<br/>
+R1(config-if)# **end**<br/>
 
 На R2 2.2.2.2  и  на  R3 3.3.3.3 , после перезагружаем маршрутизаторы командой **reload**
 
@@ -232,14 +232,14 @@ R1(config-if)# **end**
 
 Поменяем идентификатор с помощью Router id теперь на:
 
-R1 11.11.11.11
-R2 22.22.22.22
-R3 33.33.33.33
+R1 11.11.11.11<br/>
+R2 22.22.22.22<br/>
+R3 33.33.33.33<br/>
 
-R1(config)# **router ospf 1**
-R1(config-router)# **router-id 11.11.11.11**
-R1(config)# **end**
-R1# **clear ip ospf process** 
+R1(config)# **router ospf 1**<br/>
+R1(config-router)# **router-id 11.11.11.11**<br/>
+R1(config)# **end**<br/>
+R1# **clear ip ospf process** <br/>
 
 ![image-20200404222130777]( img/11.png)
 
@@ -253,12 +253,14 @@ R1# **clear ip ospf process**
 
 ![image-20200405094137797]( img/12.png)
 
-R1(config)# **router ospf 1**
-R1(config-router)# **passive-interface g7/0**
+R1(config)# **router ospf 1**<br/>
+R1(config-router)# **passive-interface g7/0**<br/>
 
 Повторно выполните команду **show ip ospf interface g7/0**, чтобы убедиться, что интерфейс G0/0 стал пассивным.
 
-![image-20200405094326713]( img/13.png)   Введите команду **show ip route** на маршрутизаторах R2 и R3, чтобы убедиться, что маршрут к сети 192.168.1.0/24 остается доступным.
+![image-20200405094326713]( img/13.png)   
+
+Введите команду **show ip route** на маршрутизаторах R2 и R3, чтобы убедиться, что маршрут к сети 192.168.1.0/24 остается доступным.
 
 ![image-20200405095438254]( img/14.png)
 
@@ -270,12 +272,12 @@ R1(config-router)# **passive-interface g7/0**
 
 ![image-20200405095248949]( img/15.png)
 
-R2(config)# **router ospf 1**
-R2(config-router)# **passive-interface default**
+R2(config)# **router ospf 1**<br/>
+R2(config-router)# **passive-interface default**<br/>
 
 
 
-R1(config-router)#**do  show ip ospf neighbor** 
+R1(config-router)#**do  show ip ospf neighbor** <br/>
 
 Neighbor ID     Pri   State           Dead Time   Address         Interface
 
@@ -283,11 +285,11 @@ Neighbor ID     Pri   State           Dead Time   Address         Interface
 
 ![image-20200405100252761]( img/16.png)
 
-R2(config-router)#**no passive-interface serial 8/0**
+R2(config-router)#**no passive-interface serial 8/0**<br/>
 
 00:25:10: %OSPF-5-ADJCHG: Process 1, Nbr 11.11.11.11 on Serial8/0 from LOADING to FULL, Loading Done
 
-Повторно выполните команды **show ip route** и **show ip ospf neighbor** 
+Повторно выполните команды **show ip route** и **show ip ospf neighbor** <br/>
 
 И увидим , что маршрут до сети 192.168.2.0/24 известен  для R3 только через R1 
 Также полное соседство сохранилось только на R1(R2 и R3 соседом является только R1)
@@ -304,8 +306,8 @@ R2(config-router)#**no passive-interface serial 8/0**
 
  Настройте интерфейс S9/0 маршрутизатора R2 так, чтобы разрешить ему объявлять маршруты OSPF. Ниже запишите используемые команды.
 
-R2(config)#router ospf 1
-R2(config-router)#no passive-interface serial 9/0
+R2(config)#router ospf 1<br/>
+R2(config-router)#no passive-interface serial 9/0<br/>
 
 Повторно введите команду **show ip route** на маршрутизаторе R3
 
@@ -314,7 +316,7 @@ R2(config-router)#no passive-interface serial 9/0
 Видим, что вернулось всё как было и доступ к сетке  192.168.2.0/24  он получает через R2 , а не R1
 Метрика вернулась со 129 на значение 65.
 
-R2(config-router)#**do show ip ospf neighbor**
+R2(config-router)#**do show ip ospf neighbor**<br/>
 
 Neighbor ID     Pri   State           Dead Time   Address         Interface
 
@@ -329,7 +331,7 @@ Neighbor ID     Pri   State           Dead Time   Address         Interface
 
 Выполним команду **show interface** на маршрутизаторе R1, чтобы просмотреть значение пропускной способности по умолчанию для интерфейса `GigabitEthernet7/0`
 
-R1#show interface
+R1#show interface<br/>
 
 `GigabitEthernet7/0` is up, line protocol is up (connected)
 Hardware is Lance, address is 0002.4a00.9cb5 (bia 0002.4a00.9cb5)
@@ -339,7 +341,7 @@ reliability 255/255, txload 1/255, rxload 1/25....
 
 Введём команду **show ip route ospf** на маршрутизаторе R1, чтобы определить маршрут к сети 192.168.3.0/24 
 
-R1#show ip route ospf 
+R1#show ip route ospf <br/>
 
 O    192.168.2.0 [110/65] via 192.168.12.2, 00:22:57, Serial8/0
 O    192.168.3.0 [110/65] via 192.168.13.2, 00:42:55, Serial9/0
@@ -361,8 +363,8 @@ O                  192.168.23.0 [110/128] via 192.168.12.2, 00:22:57, Serial8/0
 
 Чтобы изменить параметр эталонной пропускной способности по умолчанию, выполните команду **auto-cost reference-bandwidth 10000** на маршрутизаторе R1. С этим параметром стоимость интерфейсов 10 Гбит/с будет равна 1, стоимость интерфейсов 1 Гбит/с будет равна 10, а стоимость интерфейсов 100 Мбит/c будет равна 100
 
-R1(config)# router ospf 1
-R1(config-router)# auto-cost reference-bandwidth 10000
+R1(config)# router ospf 1<br/>
+R1(config-router)# auto-cost reference-bandwidth 10000<br/>
 
 ![image-20200405110707311]( img/21.png)
 
@@ -386,8 +388,8 @@ R1(config-router)# **auto-cost reference-bandwidth 100**
 
 Пропускная способность меняется на интерфейсах , так что поменяем на интерфейсе Serial 8/0 стоимость 128 на 2500 и посмотрим как поменяется метрика маршрута.
 
-R1(config)#interface serial 8/0
-R1(config-if)#bandwidth 2500
+R1(config)#interface serial 8/0<br/>
+R1(config-if)#bandwidth 2500<br/>
 
 ![image-20200405113820028]( img/26.png)
 
@@ -395,7 +397,7 @@ R1(config-if)#bandwidth 2500
 
 Как видим, пропал 1 маршрут через 192.168.23.0/30 через Se9/0 . так как Se8/0 является более оптимальным маршрутом. 
 
-**show ip ospf interface brief** - эта команда в PacketTracer не обрабатывается.
+**show ip ospf interface brief** - эта команда в PacketTracer не обрабатывается.<br/>
 
 ###  Измените стоимость маршрута
 
@@ -405,10 +407,10 @@ R1(config-if)#bandwidth 2500
 
 Выполним команду **ip ospf cost 1565** для интерфейса S8/0 маршрутизатора R1. Стоимость 1565 оказывается выше суммарной стоимости маршрута, проходящего через маршрутизатор R2 (1562).
 
-R1(config)# **interface s8/0**
-R1(config-if)# **ip ospf cost 1565**
+R1(config)# **interface s8/0**<br/>
+R1(config-if)# **ip ospf cost 1565**<br/>
 
-R1(config-if)#**show ip route ospf** 
+R1(config-if)#**show ip route ospf** <br/>
 
 ![image-20200405123510562]( img/29.png)
 
