@@ -158,17 +158,11 @@ MAC-адрес **0000.0C9F.F001** используется для виртуал
 
 Приоритет 100
 
-R3#show standby brief <br/>
+Используйте команду **show standby brief** на R1 и R3, чтобы просмотреть сводку состояния HSRP. 
 
-P indicates configured to preempt.<br/>
-Interface   Grp  Pri P State    Active          Standby         Virtual IP<br/>
-Gig9/0      1    100   Standby  192.168.1.1     local           192.168.1.254  <br/>
+![image-20200407021028047](img/image-20200407021028047.png)
 
-R1(config)#do show standby brief <br/>
-
-P indicates configured to preempt.<br/>
-Interface   Grp  Pri P State    Active          Standby         Virtual IP<br/>
-Gig6/0      1    150 P Active   local           192.168.1.3     192.168.1.254  <br/>
+![image-20200407020753734](img/image-20200407020258461.png)
 
  Измените адрес шлюза по умолчанию для PC-A, PC-C, S1 и S3. Какой адрес следует использовать?
 
@@ -222,9 +216,9 @@ R3(config-if)#standby 1 preempt
 
 c.   Используйте команду **show**, чтобы убедиться, что R3 является активным маршрутизатором.
 
-![image-20200407015702388](img/sh_st_br_R3.png)
+![image-20200407015702388](img\sh_st_br_R3.png)
 
-### **Вопросы для повторения**
+Вопросы для повторения
 
 Для чего в локальной сети может потребоваться избыточность?
 
