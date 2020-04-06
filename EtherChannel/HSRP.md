@@ -147,23 +147,28 @@ R3(config-if)# **standby 1 ip 192.168.1.254**<br/>
 ![image-20200407010752893]( img/sh_st_R3.png)
 
 Какой маршрутизатор является активным? 
+
 R1 является активным роутером
+
 Какой MAC-адрес используется для виртуального IP-адреса?
+
 MAC-адрес **0000.0C9F.F001** используется для виртуального IP-адреса
+
 Какой IP-адрес и приоритет используются для резервного маршрутизатора?
+
 Приоритет 100
 
-R3#show standby brief 
+R3#show standby brief <br/>
 
-P indicates configured to preempt.
-Interface   Grp  Pri P State    Active          Standby         Virtual IP
-Gig9/0      1    100   Standby  192.168.1.1     local           192.168.1.254  
+P indicates configured to preempt.<br/>
+Interface   Grp  Pri P State    Active          Standby         Virtual IP<br/>
+Gig9/0      1    100   Standby  192.168.1.1     local           192.168.1.254  <br/>
 
-R1(config)#do show standby brief 
+R1(config)#do show standby brief <br/>
 
-P indicates configured to preempt.
-Interface   Grp  Pri P State    Active          Standby         Virtual IP
-Gig6/0      1    150 P Active   local           192.168.1.3     192.168.1.254  
+P indicates configured to preempt.<br/>
+Interface   Grp  Pri P State    Active          Standby         Virtual IP<br/>
+Gig6/0      1    150 P Active   local           192.168.1.3     192.168.1.254  <br/>
 
  Измените адрес шлюза по умолчанию для PC-A, PC-C, S1 и S3. Какой адрес следует использовать?
 
@@ -179,21 +184,21 @@ C: />ping -t 209.165.200.225
 
 Pinging 209.165.200.225 with 32 bytes of data:
 
-Reply from 209.165.200.225: bytes=32 time=8ms TTL=254
-Reply from 209.165.200.225: bytes=32 time=1ms TTL=254
-Reply from 209.165.200.225: bytes=32 time=8ms TTL=254
-Reply from 209.165.200.225: bytes=32 time=1ms TTL=254
-Request timed out.
-Request timed out.
-Reply from 209.165.200.225: bytes=32 time=8ms TTL=254
-Reply from 209.165.200.225: bytes=32 time=1ms TTL=254
-Reply from 209.165.200.225: bytes=32 time=8ms TTL=254
-Reply from 209.165.200.225: bytes=32 time=1ms TTL=254
+Reply from 209.165.200.225: bytes=32 time=8ms TTL=254<br/>
+Reply from 209.165.200.225: bytes=32 time=1ms TTL=254<br/>
+Reply from 209.165.200.225: bytes=32 time=8ms TTL=254<br/>
+Reply from 209.165.200.225: bytes=32 time=1ms TTL=254<br/>
+Request timed out.<br/>
+Request timed out.<br/>
+Reply from 209.165.200.225: bytes=32 time=8ms TTL=254<br/>
+Reply from 209.165.200.225: bytes=32 time=1ms TTL=254<br/>
+Reply from 209.165.200.225: bytes=32 time=8ms TTL=254<br/>
+Reply from 209.165.200.225: bytes=32 time=1ms TTL=254<br/>
 
-Ping statistics for 209.165.200.225:
-       Packets: Sent = 10, Received = 8, Lost = 2 (20% loss),
-Approximate round trip times in milli-seconds:
-      Minimum = 1ms, Maximum = 8ms, Average = 1ms
+Ping statistics for 209.165.200.225:<br/>
+       Packets: Sent = 10, Received = 8, Lost = 2 (20% loss),<br/>
+Approximate round trip times in milli-seconds:<br/>
+      Minimum = 1ms, Maximum = 8ms, Average = 1ms<br/>
 
 Как видим, 2 потерянных эхо запроса ушло на восстановление 
 
@@ -217,12 +222,12 @@ R3(config-if)#standby 1 preempt
 
 c.   Используйте команду **show**, чтобы убедиться, что R3 является активным маршрутизатором.
 
-R3(config-if)#do show standby brief
+R3(config-if)#do show standby brief<br/>
 
-P indicates configured to preempt.
+P indicates configured to preempt.<br/>
 
-Interface   Grp  Pri P State    Active          Standby         Virtual IP
-Gig9/0      1    200 P Active   local           192.168.1.1     192.168.1.254  
+Interface   Grp  Pri P State    Active          Standby         Virtual IP<br/>
+Gig9/0      1    200 P Active   local           192.168.1.1     192.168.1.254  <br/>
 
 Вопросы для повторения
 
