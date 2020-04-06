@@ -222,14 +222,9 @@ R3(config-if)#standby 1 preempt
 
 c.   Используйте команду **show**, чтобы убедиться, что R3 является активным маршрутизатором.
 
-R3(config-if)#do show standby brief<br/>
+![image-20200407015702388](img/sh_st_br_R3.png)
 
-P indicates configured to preempt.<br/>
-
-Interface   Grp  Pri P State    Active          Standby         Virtual IP<br/>
-Gig9/0      1    200 P Active   local           192.168.1.1     192.168.1.254  <br/>
-
-Вопросы для повторения
+### **Вопросы для повторения**
 
 Для чего в локальной сети может потребоваться избыточность?
 
