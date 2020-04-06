@@ -36,91 +36,91 @@
 
 **Router:**
 
-Enable
-Configure terminal
+Enable<br/>
+Configure terminal<br/>
 
-no ip domain-lookup 
-hos R1
-interface Serial5/0
-ip address 10.1.1.1 255.255.255.252
-clock rate 128000
-interface GigabitEthernet6/0
-ip address 192.168.1.1 255.255.255.0
+no ip domain-lookup <br/>
+hos R1<br/>
+interface Serial5/0<br/>
+ip address 10.1.1.1 255.255.255.252<br/>
+clock rate 128000<br/>
+interface GigabitEthernet6/0<br/>
+ip address 192.168.1.1 255.255.255.0<br/>
 
-enable secret class 
-line vty 0 4 
-logging synchronous 
-password cisco 
-login 
-end
-copy running-config startup-config
-[Enter]
+enable secret class <br/>
+line vty 0 4 <br/>
+logging synchronous <br/>
+password cisco <br/>
+login <br/>
+end<br/>
+copy running-config startup-config<br/>
+[Enter]<br/>
 
-**Switch:**
+**Switch:**<br/>
 
-Enable
-Configure terminal
+Enable<br/>
+Configure terminal<br/>
 
-no ip domain-lookup 
-hostname S1
-enable secret class 
+no ip domain-lookup <br/>
+hostname S1<br/>
+enable secret class <br/>
 
-interface Vlan1
-ip address 192.168.1.11 255.255.255.0
+interface Vlan1<br/>
+ip address 192.168.1.11 255.255.255.0<br/>
 
-ip default-gateway 192.168.1.1
+ip default-gateway 192.168.1.1<br/>
 
-line vty 0 4 
-logging synchronous 
-password cisco 
-login
-end
-copy running-config startup-config
-[Enter]
+line vty 0 4 <br/>
+logging synchronous <br/>
+password cisco <br/>
+login<br/>
+end<br/>
+copy running-config startup-config<br/>
+[Enter]<br/>
 
-Проверка подключения :
+Проверка подключения :<br/>
 
-1. ПК А и ПК С ping 192.168.1.33
+1. ПК А и ПК С ping 192.168.1.33<br/>
 
-   Pinging 192.168.1.33 with 32 bytes of data:
+   Pinging 192.168.1.33 with 32 bytes of data:<br/>
 
-   Reply from 192.168.1.33: bytes=32 time=1ms TTL=128
-   Reply from 192.168.1.33: bytes=32 time=1ms TTL=128
-   Reply from 192.168.1.33: bytes=32 time<1ms TTL=128
-   Reply from 192.168.1.33: bytes=32 time<1ms TTL=128
+   Reply from 192.168.1.33: bytes=32 time=1ms TTL=128<br/>
+   Reply from 192.168.1.33: bytes=32 time=1ms TTL=128<br/>
+   Reply from 192.168.1.33: bytes=32 time<1ms TTL=128<br/>
+   Reply from 192.168.1.33: bytes=32 time<1ms TTL=128<br/>
 
-2. Запустите сеанс эхо-тестирования на PC-A и разорвите соединение между S1 и R1
+2. Запустите сеанс эхо-тестирования на PC-A и разорвите соединение между S1 и R1<br/>
 
-C: />ping 209.165.200.225
+C: />ping 209.165.200.225<br/>
 
-Pinging 209.165.200.225 with 32 bytes of data:
+Pinging 209.165.200.225 with 32 bytes of data:<br/>
 
-Request timed out.
-Request timed out.
-Request timed out.
-Request timed out.
+Request timed out.<br/>
+Request timed out.<br/>
+Request timed out.<br/>
+Request timed out.<br/>
 
-Ping statistics for 209.165.200.225:
+Ping statistics for 209.165.200.225:<br/>
 
-​    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss)
+​    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss)<br/>
 
 Эхо трафик перестал ходит по причине обрыва шлюза по умолчанию 192.168.1.1 ,  ранее пинги проходили .
 
-С ПК-С проходят ping , так как доступен шлюз по умолчанию
+С ПК-С проходят ping , так как доступен шлюз по умолчанию<br/>
 
-C: />ping 209.165.200.225
+C: />ping 209.165.200.225<br/>
 
-Pinging 209.165.200.225 with 32 bytes of data:
+Pinging 209.165.200.225 with 32 bytes of data:<br/>
 
-Reply from 209.165.200.225: bytes=32 time=2ms TTL=254
-Reply from 209.165.200.225: bytes=32 time=1ms TTL=254
-Reply from 209.165.200.225: bytes=32 time=1ms TTL=254
-Reply from 209.165.200.225: bytes=32 time=1ms TTL=254
+Reply from 209.165.200.225: bytes=32 time=2ms TTL=254<br/>
+Reply from 209.165.200.225: bytes=32 time=1ms TTL=254<br/>
+Reply from 209.165.200.225: bytes=32 time=1ms TTL=254<br/>
+Reply from 209.165.200.225: bytes=32 time=1ms TTL=254<br/>
 
-Ping statistics for 209.165.200.225:
-    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
-Approximate round trip times in milli-seconds:
-    Minimum = 1ms, Maximum = 2ms, Average = 1ms
+Ping statistics for 209.165.200.225:<br/>
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),<br/>
+Approximate round trip times in milli-seconds:<br/>
+    Minimum = 1ms, Maximum = 2ms, Average = 1ms<br/>
 
 ### Настройте HSRP на R1 и R3.
 
@@ -128,17 +128,17 @@ Approximate round trip times in milli-seconds:
 
  Настройте протокол HSRP на маршрутизаторе R1.
 
-R1(config)# **interface g0/1**
-R1(config-if)# **standby version 2**
-R1(config-if)# **standby 1 ip 192.168.1.254**
-R1(config-if)# **standby 1 priority 150**
-R1(config-if)# **standby 1 preempt**
+R1(config)# **interface g0/1**<br/>
+R1(config-if)# **standby version 2**<br/>
+R1(config-if)# **standby 1 ip 192.168.1.254**<br/>
+R1(config-if)# **standby 1 priority 150**<br/>
+R1(config-if)# **standby 1 preempt**<br/>
 
 Настройте протокол HSRP на маршрутизаторе R3.
 
-R3(config)# **interface g0/1**
-R3(config-if)# **standby version 2**
-R3(config-if)# **standby 1 ip 192.168.1.254**
+R3(config)# **interface g0/1**<br/>
+R3(config-if)# **standby version 2**<br/>
+R3(config-if)# **standby 1 ip 192.168.1.254**<br/>
 
 Проверьте HSRP, выполнив команду **show standby** на R1 и R3.
 
