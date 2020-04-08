@@ -165,6 +165,8 @@ network 192.168.2.0 0.0.0.255 area 1
 default-information originate
 exit 
 ip route 0.0.0.0 0.0.0.0 loopback 0
+do clear ip ospf process
+[yes]
 
 ### Настройте протокол OSPF на маршрутизаторе R2.
 
@@ -174,6 +176,8 @@ network 192.168.6.0 0.0.0.255 area 3
 network 192.168.12.0 0.0.0.3 area 0
 network 192.168.23.0 0.0.0.3 area 3
 passive-interface Loopback6
+do clear ip ospf process
+[yes]
 
 ### Настройте протокол OSPF на маршрутизаторе R3.
 
@@ -184,5 +188,102 @@ passive-interface Loopback4
 passive-interface Loopback5
 network 192.168.4.0 0.0.0.255 area 3
 network 192.168.5.0 0.0.0.255 area 3
+do clear ip ospf process
+[yes]
 
 ###  Убедитесь в правильности настройки протокола OSPF и в установлении отношений смежности между маршрутизаторами.
+
+![image-20200408170643422](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\31.png)
+
+![image-20200408170758777](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\32.png)
+
+Интересно ,то ,что настройку выполнил по схеме , а строки  `It is an area border router`не оказалось. Возможно глюк Packet Tracer.
+
+![image-20200408171138159](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\33.png)
+
+К какому типу маршрутизаторов OSPF относится каждый маршрутизатор?
+
+R1: ASBR , ABR, Backbone router
+
+R2: ABR, Backbone router
+
+R3: Internal router
+
+Убедимся в установлении отношений смежности OSPF между маршрутизаторами.
+
+![image-20200408173119139](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\41.png)
+
+![image-20200408173156400](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\42.png)
+
+![image-20200408173238592](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\43.png)
+
+Команда **show ip ospf interface brief** не реализована в Packet Tracer ,которая отображает   сводку стоимости маршрутов интерфейсов.
+Зато show ip ospf interface реализован , с более подробной информацией 
+![image-20200408173754239](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\50.png)
+
+На остальных роутерах аналогичная картина, Serial интерфейсы стоимостью 64 , Loopback стоимостью равны 1.
+
+### Настройте аутентификацию MD5 для всех последовательных интерфейсов
+
+**R1** 
+
+interface Serial0/0
+ip ospf authentication message-digest
+ip ospf message-digest-key 1 md5 Cisco123
+
+**R2**
+
+interface Serial0/0
+ip ospf authentication message-digest
+ip ospf message-digest-key 1 md5 Cisco123
+
+interface Serial1/0
+ip ospf authentication message-digest
+ip ospf message-digest-key 1 md5 Cisco123
+
+**R3**
+
+interface Serial0/0
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 Cisco123
+
+Почему перед настройкой аутентификации OSPF полезно проверить правильность работы OSPF?
+
+Очевидно же, чтобы проблем себе не прибавлять ,после того, как пропишем процесс OSPF на каждом роутере.
+
+### Проверьте восстановление отношений смежности OSPF.
+
+**повтор**
+
+![image-20200408173119139](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\60.png)
+
+![image-20200408173156400](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\61.png)
+
+![image-20200408173238592](C:\Users\lopunov\AppData\Roaming\Typora\typora-user-images\image-20200408173238592.png)
+
+##  Настройка межобластных суммарных маршрутов
+
+![image-20200408175301332](C:\Users\lopunov\AppData\Roaming\Typora\typora-user-images\image-20200408175301332.png)
+
+![image-20200408175358695](C:\Users\lopunov\AppData\Roaming\Typora\typora-user-images\image-20200408175358695.png)
+
+![image-20200408175435853](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\72.png)
+
+Все маршруты помеченные как (`O IA`) являются межобластным маршрутом.
+
+### Просмотрите базы данных LSDB на всех маршрутизаторах
+
+R1
+
+![image-20200408175737324](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\80.png)
+
+R2
+
+![image-20200408175820321](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\81.png)
+
+R3
+
+![image-20200408175848856](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\82.png)
+
+### Настройте межобластные суммарные маршруты
+
