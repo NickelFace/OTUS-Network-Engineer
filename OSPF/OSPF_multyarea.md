@@ -131,11 +131,11 @@ do copy run start<br/>
 
 Выполните команду **show ip interface brief**, чтобы убедиться в правильности IP-адресации и активности интерфейсов. Убедитесь, что каждый маршрутизатор может успешно отправлять эхо-запросы соседним маршрутизаторам, подключенным с помощью последовательных интерфейсов.
 
-![21](img\mult\21.png)
+![21](img/mult/21.png)
 
-![22](img\mult\22.png)
+![22](img/mult/22.png)
 
-![23](img\mult\23.png)
+![23](img/mult/23.png)
 
 ## Настройка сети OSPFv2 для нескольких областей
 
@@ -155,51 +155,51 @@ do copy run start<br/>
 
 Настроим сети OSPF на R1 , укажем пассивные интерфейсы , а также будем рассказывать по OSPF о дефолтном маршруте выхода в интернет.
 
-router ospf 1
-router-id 1.1.1.1
-network192.168.1.0 0.0.0.255 area 1
-network 192.168.2.0 0.0.0.255 area 1
- network 192.168.12.0 0.0.0.3 area 0
- passive-interface Loopback1
- passive-interface Loopback2
-default-information originate
-exit 
-ip route 0.0.0.0 0.0.0.0 loopback 0
-do clear ip ospf process
-[yes]
+router ospf 1<br/>
+router-id 1.1.1.1<br/>
+network192.168.1.0 0.0.0.255 area 1<br/>
+network 192.168.2.0 0.0.0.255 area 1<br/>
+ network 192.168.12.0 0.0.0.3 area 0<br/>
+ passive-interface Loopback1<br/>
+ passive-interface Loopback2<br/>
+default-information originate<br/>
+exit <br/>
+ip route 0.0.0.0 0.0.0.0 loopback 0<br/>
+do clear ip ospf process<br/>
+[yes]<br/>
 
 ### Настройте протокол OSPF на маршрутизаторе R2.
 
-router ospf 1
-router-id 2.2.2.2
-network 192.168.6.0 0.0.0.255 area 3
-network 192.168.12.0 0.0.0.3 area 0
-network 192.168.23.0 0.0.0.3 area 3
-passive-interface Loopback6
-do clear ip ospf process
-[yes]
+router ospf 1<br/>
+router-id 2.2.2.2<br/>
+network 192.168.6.0 0.0.0.255 area 3<br/>
+network 192.168.12.0 0.0.0.3 area 0<br/>
+network 192.168.23.0 0.0.0.3 area 3<br/>
+passive-interface Loopback6<br/>
+do clear ip ospf process<br/>
+[yes]<br/>
 
 ### Настройте протокол OSPF на маршрутизаторе R3.
 
-router ospf 1
-router-id 3.3.3.3
-network 192.168.23.0 0.0.0.3 area 3
-passive-interface Loopback4
-passive-interface Loopback5
-network 192.168.4.0 0.0.0.255 area 3
-network 192.168.5.0 0.0.0.255 area 3
-do clear ip ospf process
-[yes]
+router ospf 1<br/>
+router-id 3.3.3.3<br/>
+network 192.168.23.0 0.0.0.3 area 3<br/>
+passive-interface Loopback4<br/>
+passive-interface Loopback5<br/>
+network 192.168.4.0 0.0.0.255 area 3<br/>
+network 192.168.5.0 0.0.0.255 area 3<br/>
+do clear ip ospf process<br/>
+[yes]<br/>
 
 ###  Убедитесь в правильности настройки протокола OSPF и в установлении отношений смежности между маршрутизаторами.
 
-![image-20200408170643422](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\31.png)
+![image]( img/mult/31.png)
 
-![image-20200408170758777](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\32.png)
+![image]( img/mult/32.png)
 
 Интересно ,то ,что настройку выполнил по схеме , а строки  `It is an area border router`не оказалось. Возможно глюк Packet Tracer.
 
-![image-20200408171138159](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\33.png)
+![image]( img/mult/33.png)
 
 К какому типу маршрутизаторов OSPF относится каждый маршрутизатор?
 
@@ -211,15 +211,15 @@ R3: Internal router
 
 Убедимся в установлении отношений смежности OSPF между маршрутизаторами.
 
-![image-20200408173119139](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\41.png)
+![image-20200408173119139]( img/mult/41.png)
 
-![image-20200408173156400](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\42.png)
+![image-20200408173156400]( img/mult/42.png)
 
-![image-20200408173238592](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\43.png)
+![image-20200408173238592]( img/mult/43.png)
 
 Команда **show ip ospf interface brief** не реализована в Packet Tracer ,которая отображает   сводку стоимости маршрутов интерфейсов.
 Зато show ip ospf interface реализован , с более подробной информацией 
-![image-20200408173754239](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\50.png)
+![image-20200408173754239]( img/mult/50.png)
 
 На остальных роутерах аналогичная картина, Serial интерфейсы стоимостью 64 , Loopback стоимостью равны 1.
 
@@ -227,25 +227,25 @@ R3: Internal router
 
 **R1** 
 
-interface Serial0/0
-ip ospf authentication message-digest
-ip ospf message-digest-key 1 md5 Cisco123
+interface Serial0/0<br/>
+ip ospf authentication message-digest<br/>
+ip ospf message-digest-key 1 md5 Cisco123<br/>
 
 **R2**
 
-interface Serial0/0
-ip ospf authentication message-digest
-ip ospf message-digest-key 1 md5 Cisco123
+interface Serial0/0<br/>
+ip ospf authentication message-digest<br/>
+ip ospf message-digest-key 1 md5 Cisco123<br/>
 
-interface Serial1/0
-ip ospf authentication message-digest
-ip ospf message-digest-key 1 md5 Cisco123
+interface Serial1/0<br/>
+ip ospf authentication message-digest<br/>
+ip ospf message-digest-key 1 md5 Cisco123<br/>
 
 **R3**
 
-interface Serial0/0
- ip ospf authentication message-digest
- ip ospf message-digest-key 1 md5 Cisco123
+interface Serial0/0<br/>
+ ip ospf authentication message-digest<br/>
+ ip ospf message-digest-key 1 md5 Cisco123<br/>
 
 Почему перед настройкой аутентификации OSPF полезно проверить правильность работы OSPF?
 
@@ -253,21 +253,19 @@ interface Serial0/0
 
 ### Проверьте восстановление отношений смежности OSPF.
 
-**повтор**
+![image-20200408173119139]( img/mult/60.png)
 
-![image-20200408173119139](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\60.png)
+![image-20200408173156400]( img/mult/61.png)
 
-![image-20200408173156400](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\61.png)
-
-![image-20200408173238592](C:\Users\lopunov\AppData\Roaming\Typora\typora-user-images\image-20200408173238592.png)
+![image]( img/mult/62.png)
 
 ##  Настройка межобластных суммарных маршрутов
 
-![image-20200408175301332](C:\Users\lopunov\AppData\Roaming\Typora\typora-user-images\image-20200408175301332.png)
+![image]( img/mult/70.png)
 
-![image-20200408175358695](C:\Users\lopunov\AppData\Roaming\Typora\typora-user-images\image-20200408175358695.png)
+![image]( img/mult/71.png)
 
-![image-20200408175435853](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\72.png)
+![image]( img/mult/72.png)
 
 Все маршруты помеченные как (`O IA`) являются межобластным маршрутом.
 
@@ -275,15 +273,75 @@ interface Serial0/0
 
 R1
 
-![image-20200408175737324](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\80.png)
+![image]( img/mult/80.png)
 
 R2
 
-![image-20200408175820321](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\81.png)
+![image]( img/mult/81.png)
 
 R3
 
-![image-20200408175848856](C:\Users\lopunov\Documents\GitHub\OTUS_Network\OSPF\img\mult\82.png)
+![image]( img/mult/82.png)
 
 ### Настройте межобластные суммарные маршруты
+
+Настроим суммарный маршрут для сетей в области 1 на R1.
+
+R1(config)# **router ospf 1**<br/>
+R1(config-router)# **area 1 range 192.168.0.0 255.255.252.0**<br/>
+
+![image](img/mult/90.png)
+
+Настроим суммарный маршрут для сетей в области 3 на R2.
+
+R2(config)# **router ospf 1**<br/>
+R2(config-router)#**area 3 range 192.168.4.0 255.255.254.0**<br/>
+
+![image](img/mult/91.png)
+
+![image](img/mult/92.png)
+
+На скриншотах выше показано использование команды и её результаты работы ,которые повлияли на таблицу маршрутизации. Таблица стала меньше ,более компактной.
+
+### Повторно отобразите таблицы маршрутизации OSPF для всех маршрутизаторов.
+
+Выполним команду **show ip route ospf** на каждом маршрутизаторе. Запишим результаты для суммарных и межобластных маршрутов.
+
+![image]( img/mult/100.png)
+
+![image]( img/mult/101.png)
+
+![image]( img/mult/102.png)
+
+### Просмотрите базы данных LSDB на всех маршрутизаторах.
+
+R1
+
+![image]( img/mult/110.png)
+
+R2
+
+![image]( img/mult/111.png)
+
+R3
+
+![image]( img/mult/112.png)
+
+
+
+Пакет LSA какого типа передается в магистраль маршрутизатором ABR, когда включено объединение межобластных маршрутов?
+
+Summary Net Link States , то есть LSA 3 типа
+
+###  Проверьте наличие сквозного соединения.
+
+Проверил  доступность каждой сети . Как и в начале , до каждой сети можно добраться с каждого роутера. Не вижу смысла выводить скриншоты.
+
+Вопросы для повторения
+
+Какие три преимущества при проектировании сети предоставляет OSPF для нескольких областей?
+
+- **Снижение накладных расходов на обновление состояний каналов.**
+- **Таблицы маршрутизации меньшего размера**. 
+- **Снижение частоты расчётов кратчайшего пути SPF**.
 
