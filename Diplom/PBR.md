@@ -18,7 +18,39 @@
 
 1) Настроите политику маршрутизации для сетей офиса Чокурдах 
 
-Выполнил ещё на домашке по IP адресации. Демонстрировать не вижу смысла,переходим в раздел папки img первые 3 картинки.
+Четко что нужно сделать не написано,ок потренируюсь с определенного ip маршрутизировать трафик :
+
+```
+ip access-list extended ACL1
+ permit ip host 172.16.40.11 any
+
+route-map TEST permit 10
+ match ip address ACL1
+ set ip next-hop 111.110.35.13
+ 
+interface Ethernet0/2
+ ip policy route-map TEST
+```
+
+VPC30
+
+```
+VPCS> trace 6.6.6.6
+trace to 6.6.6.6, 8 hops max, press Ctrl+C to stop
+ 1   172.16.40.1   0.755 ms  0.719 ms  0.677 ms
+ 2   111.110.35.9   0.932 ms  0.833 ms  0.708 ms
+ 3   *10.10.30.18   1.084 ms (ICMP type:3, code:3, Destination port unreachable)
+```
+
+VPC31
+
+```
+VPCS> trace 6.6.6.6
+trace to 6.6.6.6, 8 hops max, press Ctrl+C to stop
+ 1   172.16.40.1   1.488 ms  1.462 ms  1.425 ms
+ 2   111.110.35.13   1.981 ms  1.662 ms  1.628 ms
+ 3   *10.10.30.22   2.379 ms (ICMP type:3, code:3, Destination port unreachable)
+```
 
 2) Распределите трафик между двумя линками с провайдером в Чокурдах
 
