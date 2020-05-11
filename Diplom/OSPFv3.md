@@ -1,4 +1,4 @@
-# Работа протокола OSPF для IPv6
+Работа протокола OSPF для IPv6
 
 ## Домашнее задание
 
@@ -106,7 +106,7 @@ interface Ethernet0/3
 
 
 
-R19
+**R19**
 
 ```
 ipv6 router ospf 1
@@ -116,11 +116,26 @@ ipv6 router ospf 1
 interface Ethernet0/0
  ipv6 address FE80:6::19 link-local
  ipv6 ospf 1 area 101
+ 
 ```
 
+Проверим какие получает маршруты R19
 
+```
+R19#sh ipv6 route ospf
+IPv6 Routing Table - default - 4 entries
+Codes: C - Connected, L - Local, S - Static, U - Per-user Static route
+       B - BGP, HA - Home Agent, MR - Mobile Router, R - RIP
+       H - NHRP, I1 - ISIS L1, I2 - ISIS L2, IA - ISIS interarea
+       IS - ISIS summary, D - EIGRP, EX - EIGRP external, NM - NEMO
+       ND - ND Default, NDp - ND Prefix, DCE - Destination, NDr - Redirect
+       O - OSPF Intra, OI - OSPF Inter, OE1 - OSPF ext 1, OE2 - OSPF ext 2
+       ON1 - OSPF NSSA ext 1, ON2 - OSPF NSSA ext 2, l - LISP
+OI  ::/0 [110/11]
+     via FE80:6::14, Ethernet0/0
+```
 
-R20
+**R20**
 
 ```
 ipv6 router ospf 1
@@ -131,15 +146,34 @@ interface Ethernet0/0
  ipv6 ospf 1 area 102
 ```
 
+Проверим какие получает маршруты R20
 
+```
+R20#show ipv6 route ospf
+IPv6 Routing Table - default - 9 entries
+Codes: C - Connected, L - Local, S - Static, U - Per-user Static route
+       B - BGP, HA - Home Agent, MR - Mobile Router, R - RIP
+       H - NHRP, I1 - ISIS L1, I2 - ISIS L2, IA - ISIS interarea
+       IS - ISIS summary, D - EIGRP, EX - EIGRP external, NM - NEMO
+       ND - ND Default, NDp - ND Prefix, DCE - Destination, NDr - Redirect
+       O - OSPF Intra, OI - OSPF Inter, OE1 - OSPF ext 1, OE2 - OSPF ext 2
+       ON1 - OSPF NSSA ext 1, ON2 - OSPF NSSA ext 2, l - LISP
+OI  2002:ACAD:DB8::/64 [110/20]
+     via FE80:3::15, Ethernet0/0
+OI  2002:ACAD:DB8:1::/64 [110/20]
+     via FE80:3::15, Ethernet0/0
+OI  2002:ACAD:DB8:4::/64 [110/30]
+     via FE80:3::15, Ethernet0/0
+OI  2002:ACAD:DB8:5::/64 [110/30]
+     via FE80:3::15, Ethernet0/0
+OI  2002:ACAD:DB8:8::/64 [110/30]
+     via FE80:3::15, Ethernet0/0
+OI  2002:ACAD:DB8:9::/64 [110/30]
+     via FE80:3::15, Ethernet0/0
 
+```
 
-
-
-
-
-
-
+Как видно ,внешнюю сеть **2002:ACAD:DB8:7::/64** мы не получаем
 
 
 
