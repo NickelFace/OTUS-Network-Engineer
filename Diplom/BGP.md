@@ -345,3 +345,5 @@ Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/2 ms
 **Для доступа к прописанным конфигурациям на роутерах ,то жмём сюда :**
 
 https://e9exu-my.sharepoint.com/:f:/g/personal/nickelface_ermaon_com/Euh_hOXWUWRAr0awcVlpJVYBzobOZWNdcKt4VLkLif40EA?e=GGNmyl
+
+1111111111111111111111111111
