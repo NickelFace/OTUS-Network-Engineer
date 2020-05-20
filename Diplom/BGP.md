@@ -9,7 +9,6 @@
 3.  Настроите eBGP между Ламас и Триада
 4. eBGP между офисом С.-Петербург и провайдером Триада
 5. Организуете IP доступность между офисами Москва и С.-Петербург
-6. Настроите отслеживание линка через технологию IP SLA
 7. План работы и изменения зафиксированы в документации
 
 ![EVE_Topology](img/EVE_Topology.png)
@@ -23,7 +22,6 @@ R14
 ```
 router bgp 1001
  bgp log-neighbor-changes
- network 100.100.100.0 mask 255.255.255.252
  neighbor 10.10.10.26 remote-as 1001
  neighbor 100.100.100.2 remote-as 101
 ```
@@ -31,19 +29,19 @@ router bgp 1001
 ```
 R14(config-router)#do sh ip bgp sum
 BGP router identifier 100.100.100.1, local AS number 1001
-BGP table version is 34, main routing table version 34
+BGP table version is 39, main routing table version 39
 10 network entries using 1440 bytes of memory
-17 path entries using 1360 bytes of memory
-8/6 BGP path/bestpath attribute entries using 1216 bytes of memory
+19 path entries using 1520 bytes of memory
+6/4 BGP path/bestpath attribute entries using 912 bytes of memory
 6 BGP AS-PATH entries using 144 bytes of memory
 0 BGP route-map cache entries using 0 bytes of memory
 0 BGP filter-list cache entries using 0 bytes of memory
-BGP using 4160 total bytes of memory
-BGP activity 12/2 prefixes, 23/6 paths, scan interval 60 secs
+BGP using 4016 total bytes of memory
+BGP activity 13/3 prefixes, 28/9 paths, scan interval 60 secs
 
 Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-10.10.10.26     4         1001     185     191       34    0    0 02:37:13        6
-100.100.100.2   4          101     258     259       34    0    0 03:41:46       10
+10.10.10.26     4         1001      48      56       39    0    0 00:35:52        9
+100.100.100.2   4          101      53      55       39    0    0 00:35:49       10
 ```
 
 R15 
@@ -51,26 +49,25 @@ R15
 ```
 router bgp 1001
  bgp log-neighbor-changes
- network 111.111.111.0 mask 255.255.255.252
  neighbor 10.10.10.25 remote-as 1001
  neighbor 111.111.111.2 remote-as 301
 ```
 
 ```
 BGP router identifier 111.111.111.1, local AS number 1001
-BGP table version is 26, main routing table version 26
+BGP table version is 33, main routing table version 33
 10 network entries using 1440 bytes of memory
-17 path entries using 1360 bytes of memory
-8/6 BGP path/bestpath attribute entries using 1216 bytes of memory
+19 path entries using 1520 bytes of memory
+6/4 BGP path/bestpath attribute entries using 912 bytes of memory
 6 BGP AS-PATH entries using 144 bytes of memory
 0 BGP route-map cache entries using 0 bytes of memory
 0 BGP filter-list cache entries using 0 bytes of memory
-BGP using 4160 total bytes of memory
-BGP activity 12/2 prefixes, 26/9 paths, scan interval 60 secs
+BGP using 4016 total bytes of memory
+BGP activity 13/3 prefixes, 31/12 paths, scan interval 60 secs
 
 Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-10.10.10.25     4         1001     192     186       26    0    0 02:38:07        6
-111.111.111.2   4          301     184     185       26    0    0 02:37:22       10
+10.10.10.25     4         1001      58      50       33    0    0 00:37:03        9
+111.111.111.2   4          301      51      50       33    0    0 00:37:07       10
 ```
 
 R21
@@ -88,20 +85,20 @@ router bgp 301
 
 ```
 BGP router identifier 111.111.111.5, local AS number 301
-BGP table version is 17, main routing table version 17
+BGP table version is 25, main routing table version 25
 10 network entries using 1440 bytes of memory
-20 path entries using 1600 bytes of memory
-10/5 BGP path/bestpath attribute entries using 1520 bytes of memory
-7 BGP AS-PATH entries using 168 bytes of memory
+19 path entries using 1520 bytes of memory
+7/4 BGP path/bestpath attribute entries using 1064 bytes of memory
+5 BGP AS-PATH entries using 120 bytes of memory
 0 BGP route-map cache entries using 0 bytes of memory
 0 BGP filter-list cache entries using 0 bytes of memory
-BGP using 4728 total bytes of memory
-BGP activity 11/1 prefixes, 26/6 paths, scan interval 60 secs
+BGP using 4144 total bytes of memory
+BGP activity 13/3 prefixes, 37/18 paths, scan interval 60 secs
 
 Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-110.110.110.1   4          101     266     267       17    0    0 03:52:06        6
-111.111.111.1   4         1001     186     185       17    0    0 02:38:09        5
-111.111.111.6   4          520     176     183       17    0    0 02:33:28        6
+110.110.110.1   4          101      57      52       25    0    0 00:38:16        7
+111.111.111.1   4         1001      51      52       25    0    0 00:38:14        1
+111.111.111.6   4          520      30      33       25    0    0 00:21:39        8
 ```
 
 R22
@@ -111,7 +108,6 @@ router bgp 101
  bgp log-neighbor-changes
  network 100.100.100.0 mask 255.255.255.252
  network 100.100.100.4 mask 255.255.255.252
- network 110.110.110.0 mask 255.255.255.252
  neighbor 100.100.100.1 remote-as 1001
  neighbor 100.100.100.6 remote-as 520
  neighbor 110.110.110.2 remote-as 301
