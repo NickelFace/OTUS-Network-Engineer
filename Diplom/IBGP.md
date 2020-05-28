@@ -25,19 +25,26 @@ R14
 ```
 R14#show ip bgp summary
 BGP router identifier 14.14.14.14, local AS number 1001
-BGP table version is 14, main routing table version 14
+BGP table version is 11, main routing table version 11
 10 network entries using 1480 bytes of memory
-19 path entries using 1216 bytes of memory
-6/4 BGP path/bestpath attribute entries using 816 bytes of memory
-6 BGP AS-PATH entries using 144 bytes of memory
+10 path entries using 640 bytes of memory
+3/3 BGP path/bestpath attribute entries using 408 bytes of memory
+3 BGP AS-PATH entries using 72 bytes of memory
 0 BGP route-map cache entries using 0 bytes of memory
 0 BGP filter-list cache entries using 0 bytes of memory
-BGP using 3656 total bytes of memory
-BGP activity 10/0 prefixes, 19/0 paths, scan interval 60 secs
+BGP using 2600 total bytes of memory
+BGP activity 10/0 prefixes, 10/0 paths, scan interval 60 secs
 
 Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-10.10.10.26     4         1001      77      78       14    0    0 01:04:49        9
-100.100.100.2   4          101      77      76       14    0    0 01:04:45       10
+1.1.1.15        4         1001      24      27       11    0    0 00:14:09        0
+100.100.100.2   4          101      28      23       11    0    0 00:18:46       10
+
+----------------------------------------------------------------------------------------
+router ospf 1
+ network 1.1.1.14 0.0.0.0 area 0
+----------------------------------------------------------------------------------------
+interface Loopback0
+ ip address 1.1.1.14 255.255.255.255
 ```
 
 R15
@@ -45,19 +52,25 @@ R15
 ```
 R15#show ip bgp summary
 BGP router identifier 15.15.15.15, local AS number 1001
-BGP table version is 13, main routing table version 13
+BGP table version is 21, main routing table version 21
 10 network entries using 1480 bytes of memory
-19 path entries using 1216 bytes of memory
-6/4 BGP path/bestpath attribute entries using 816 bytes of memory
-6 BGP AS-PATH entries using 144 bytes of memory
+10 path entries using 640 bytes of memory
+3/3 BGP path/bestpath attribute entries using 408 bytes of memory
+3 BGP AS-PATH entries using 72 bytes of memory
 0 BGP route-map cache entries using 0 bytes of memory
 0 BGP filter-list cache entries using 0 bytes of memory
-BGP using 3656 total bytes of memory
-BGP activity 10/0 prefixes, 19/0 paths, scan interval 60 secs
+BGP using 2600 total bytes of memory
+BGP activity 10/0 prefixes, 10/0 paths, scan interval 60 secs
 
 Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-10.10.10.25     4         1001      81      80       13    0    0 01:07:15        9
-111.111.111.2   4          301      80      76       13    0    0 01:07:15       10
+1.1.1.14        4         1001      31      28       21    0    0 00:18:04       10
+111.111.111.2   4          301      31      32       21    0    0 00:20:19        0
+----------------------------------------------------------------------------------------
+router ospf 1
+ network 1.1.1.15 0.0.0.0 area 0
+----------------------------------------------------------------------------------------
+interface Loopback0
+ ip address 1.1.1.15 255.255.255.255
 ```
 
 ### Настроите iBGP в провайдере Триада
@@ -157,6 +170,7 @@ Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State
 1. для ухудшения пути для R15 я поставил route-map в сторону провайдера увеличивающий путь
 2. Установил R14 роутером по умолчанию для BGP 
 3. R14 раздает маршруты от себя 
+4. Улучшил атрибут вес для соседа R14
 
 R14
 
@@ -165,10 +179,32 @@ R14(config)#do sh run | s bgp
 router bgp 1001
  bgp router-id 14.14.14.14
  bgp log-neighbor-changes
- neighbor 10.10.10.26 remote-as 1001
- neighbor 10.10.10.26 next-hop-self
+ neighbor 1.1.1.15 remote-as 1001
+ neighbor 1.1.1.15 update-source Loopback0
+ neighbor 1.1.1.15 next-hop-self
  neighbor 100.100.100.2 remote-as 101
  default-information originate
+ 
+ ----------------------------------------- 
+ R14(config)#do show ip bgp
+BGP table version is 11, local router ID is 14.14.14.14
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
+              r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
+              x best-external, a additional-path, c RIB-compressed,
+Origin codes: i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+
+     Network          Next Hop            Metric LocPrf Weight Path
+ *>  77.77.77.8/30    100.100.100.2                          0 101 520 i
+ *>  77.77.77.12/30   100.100.100.2                          0 101 520 i
+ r>  100.100.100.0/30 100.100.100.2            0             0 101 i
+ *>  100.100.100.4/30 100.100.100.2            0             0 101 i
+ *>  110.110.110.0/30 100.100.100.2                          0 101 301 i
+ *>  111.110.35.8/30  100.100.100.2                          0 101 520 i
+ *>  111.110.35.12/30 100.100.100.2                          0 101 520 i
+ *>  111.111.111.0/30 100.100.100.2                          0 101 301 i
+ *>  111.111.111.4/30 100.100.100.2                          0 101 301 i
+ *>  210.110.35.0/30  100.100.100.2                          0 101 520 i
 
 ```
 
@@ -181,7 +217,9 @@ R15(config-router)#do sh run | s bgp
 router bgp 1001
  bgp router-id 15.15.15.15
  bgp log-neighbor-changes
- neighbor 10.10.10.25 remote-as 1001
+ neighbor 1.1.1.14 remote-as 1001
+ neighbor 1.1.1.14 update-source Loopback0
+ neighbor 1.1.1.14 weight 100
  neighbor 111.111.111.2 remote-as 301
  neighbor 111.111.111.2 route-map SET-ASPATH in
 
@@ -189,12 +227,33 @@ router bgp 1001
 
 route-map SET-ASPATH permit 10
  set as-path prepend 1001 1001 1001
+ 
+ ---------------------------------------------------------------------------
+ 
+ R15(config-router)#do show ip bgp
+BGP table version is 21, local router ID is 15.15.15.15
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
+              r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
+              x best-external, a additional-path, c RIB-compressed,
+Origin codes: i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+
+     Network          Next Hop            Metric LocPrf Weight Path
+ *>i 77.77.77.8/30    1.1.1.14                 0    100    100 101 520 i
+ *>i 77.77.77.12/30   1.1.1.14                 0    100    100 101 520 i
+ *>i 100.100.100.0/30 1.1.1.14                 0    100    100 101 i
+ *>i 100.100.100.4/30 1.1.1.14                 0    100    100 101 i
+ *>i 110.110.110.0/30 1.1.1.14                 0    100    100 101 301 i
+ *>i 111.110.35.8/30  1.1.1.14                 0    100    100 101 520 i
+ *>i 111.110.35.12/30 1.1.1.14                 0    100    100 101 520 i
+ r>i 111.111.111.0/30 1.1.1.14                 0    100    100 101 301 i
+ *>i 111.111.111.4/30 1.1.1.14                 0    100    100 101 301 i
+ *>i 210.110.35.0/30  1.1.1.14                 0    100    100 101 520 i
+
 
 ```
 
 ### В офисе С.-Петербург работает протокол iBGP. (Не использовать протокол OSPF)
-
-Раз OSPF нельзя, значит EIGRP можно,логика проста)
 
 R16
 
