@@ -144,7 +144,7 @@ Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State
 R26
 
 ```
-R26#show ip bgp summary
+![BestPath](C:\Users\lopunov\Documents\GitHub\OTUS_Network\Diplom\img\BestPath.png)R26#show ip bgp summary
 BGP router identifier 26.26.26.26, local AS number 520
 BGP table version is 6, main routing table version 6
 10 network entries using 1480 bytes of memory
@@ -165,13 +165,6 @@ Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State
 
 ### Настройте офиса Москва так, чтобы приоритетным провайдером стал Ламас.
 
-В данном случае я предпринял несколько действий 
-
-1. для ухудшения пути для R15 я поставил route-map в сторону провайдера увеличивающий путь
-2. Установил R14 роутером по умолчанию для BGP 
-3. R14 раздает маршруты от себя 
-4. Улучшил атрибут вес для соседа R14
-
 R14
 
 ```
@@ -183,7 +176,6 @@ router bgp 1001
  neighbor 1.1.1.15 update-source Loopback0
  neighbor 1.1.1.15 next-hop-self
  neighbor 100.100.100.2 remote-as 101
- default-information originate
  
  ----------------------------------------- 
  R14(config)#do show ip bgp
@@ -219,19 +211,22 @@ router bgp 1001
  bgp log-neighbor-changes
  neighbor 1.1.1.14 remote-as 1001
  neighbor 1.1.1.14 update-source Loopback0
- neighbor 1.1.1.14 weight 100
+ neighbor 1.1.1.14 route-map LP in
  neighbor 111.111.111.2 remote-as 301
- neighbor 111.111.111.2 route-map SET-ASPATH in
+ neighbor 111.111.111.2 route-map SET_ASPATH in
 
  ---------------------------------------------------------------------------
-
-route-map SET-ASPATH permit 10
- set as-path prepend 1001 1001 1001
  
+route-map LP permit 10
+ set local-preference 150
+
+route-map SET_ASPATH permit 10
+ set as-path prepend 1001 1001 1001
  ---------------------------------------------------------------------------
  
  R15(config-router)#do show ip bgp
-BGP table version is 21, local router ID is 15.15.15.15
+
+BGP table version is 11, local router ID is 15.15.15.15
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
               r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
               x best-external, a additional-path, c RIB-compressed,
@@ -239,18 +234,26 @@ Origin codes: i - IGP, e - EGP, ? - incomplete
 RPKI validation codes: V valid, I invalid, N Not found
 
      Network          Next Hop            Metric LocPrf Weight Path
- *>i 77.77.77.8/30    1.1.1.14                 0    100    100 101 520 i
- *>i 77.77.77.12/30   1.1.1.14                 0    100    100 101 520 i
- *>i 100.100.100.0/30 1.1.1.14                 0    100    100 101 i
- *>i 100.100.100.4/30 1.1.1.14                 0    100    100 101 i
- *>i 110.110.110.0/30 1.1.1.14                 0    100    100 101 301 i
- *>i 111.110.35.8/30  1.1.1.14                 0    100    100 101 520 i
- *>i 111.110.35.12/30 1.1.1.14                 0    100    100 101 520 i
- r>i 111.111.111.0/30 1.1.1.14                 0    100    100 101 301 i
- *>i 111.111.111.4/30 1.1.1.14                 0    100    100 101 301 i
- *>i 210.110.35.0/30  1.1.1.14                 0    100    100 101 520 i
-
-
+ *>i 77.77.77.8/30    1.1.1.14                 0    150      0 101 520 i
+ *                    111.111.111.2                          0 1001 1001 1001 301 520 i
+ *>i 77.77.77.12/30   1.1.1.14                 0    150      0 101 520 i
+ *                    111.111.111.2                          0 1001 1001 1001 301 520 i
+ *>i 100.100.100.0/30 1.1.1.14                 0    150      0 101 i
+ *                    111.111.111.2                          0 1001 1001 1001 301 101 i
+ *>i 100.100.100.4/30 1.1.1.14                 0    150      0 101 i
+ *                    111.111.111.2                          0 1001 1001 1001 301 101 i
+ *>i 110.110.110.0/30 1.1.1.14                 0    150      0 101 301 i
+ *                    111.111.111.2            0             0 1001 1001 1001 301 i
+ *>i 111.110.35.8/30  1.1.1.14                 0    150      0 101 520 i
+ *                    111.111.111.2                          0 1001 1001 1001 301 520 i
+ *>i 111.110.35.12/30 1.1.1.14                 0    150      0 101 520 i
+ *                    111.111.111.2                          0 1001 1001 1001 301 520 i
+ r>i 111.111.111.0/30 1.1.1.14                 0    150      0 101 301 i
+ r                    111.111.111.2            0             0 1001 1001 1001 301 i
+ *>i 111.111.111.4/30 1.1.1.14                 0    150      0 101 301 i
+ *                    111.111.111.2            0             0 1001 1001 1001 301 i
+ *>i 210.110.35.0/30  1.1.1.14                 0    150      0 101 520 i
+ *                    111.111.111.2                          0 1001 1001 1001 301 520 i
 ```
 
 ### В офисе С.-Петербург работает протокол iBGP. (Не использовать протокол OSPF)
