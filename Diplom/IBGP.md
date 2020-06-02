@@ -144,7 +144,7 @@ Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State
 R26
 
 ```
-![BestPath](C:\Users\lopunov\Documents\GitHub\OTUS_Network\Diplom\img\BestPath.png)R26#show ip bgp summary
+R26#show ip bgp summary
 BGP router identifier 26.26.26.26, local AS number 520
 BGP table version is 6, main routing table version 6
 10 network entries using 1480 bytes of memory
@@ -172,14 +172,28 @@ R14(config)#do sh run | s bgp
 router bgp 1001
  bgp router-id 14.14.14.14
  bgp log-neighbor-changes
- neighbor 1.1.1.15 remote-as 1001
- neighbor 1.1.1.15 update-source Loopback0
- neighbor 1.1.1.15 next-hop-self
+ network 210.210.210.210 mask 255.255.255.255
+ neighbor SPB peer-group
+ neighbor SPB remote-as 1001
+ neighbor SPB update-source Loopback0
+ neighbor SPB next-hop-self
+ neighbor 1.1.1.15 peer-group SPB
+ neighbor 1.1.1.15 route-map FILTER in
  neighbor 100.100.100.2 remote-as 101
- 
+
  ----------------------------------------- 
+Создаю  route-map :
+route-map FILTER permit 10
+ set local-preference 150
+ 
+А также интерфейс для следующей лабы.
+ interface Loopback1
+ ip address 210.210.210.210 255.255.255.255
+
+ ----------------------------------------- 
+ 
  R14(config)#do show ip bgp
-BGP table version is 11, local router ID is 14.14.14.14
+BGP table version is 60, local router ID is 14.14.14.14
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
               r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
               x best-external, a additional-path, c RIB-compressed,
@@ -187,46 +201,61 @@ Origin codes: i - IGP, e - EGP, ? - incomplete
 RPKI validation codes: V valid, I invalid, N Not found
 
      Network          Next Hop            Metric LocPrf Weight Path
- *>  77.77.77.8/30    100.100.100.2                          0 101 520 i
- *>  77.77.77.12/30   100.100.100.2                          0 101 520 i
- r>  100.100.100.0/30 100.100.100.2            0             0 101 i
- *>  100.100.100.4/30 100.100.100.2            0             0 101 i
- *>  110.110.110.0/30 100.100.100.2                          0 101 301 i
- *>  111.110.35.8/30  100.100.100.2                          0 101 520 i
- *>  111.110.35.12/30 100.100.100.2                          0 101 520 i
- *>  111.111.111.0/30 100.100.100.2                          0 101 301 i
- *>  111.111.111.4/30 100.100.100.2                          0 101 301 i
- *>  210.110.35.0/30  100.100.100.2                          0 101 520 i
+ r>i 0.0.0.0          1.1.1.15                 0    150      0 301 i
+ r                    100.100.100.2                          0 101 i
+ *>i 77.77.77.8/30    1.1.1.15                 0    150      0 301 520 i
+ *>i 77.77.77.12/30   1.1.1.15                 0    150      0 301 520 i
+ r>i 100.100.100.0/30 1.1.1.15                 0    150      0 301 101 i
+ *>i 100.100.100.4/30 1.1.1.15                 0    150      0 301 101 i
+ *>i 110.110.110.0/30 1.1.1.15                 0    150      0 301 i
+ *>i 111.110.35.8/30  1.1.1.15                 0    150      0 301 520 i
+ *>i 111.110.35.12/30 1.1.1.15                 0    150      0 301 520 i
+ *>i 111.111.111.0/30 1.1.1.15                 0    150      0 301 i
+ *>i 111.111.111.4/30 1.1.1.15                 0    150      0 301 i
+ *>i 210.110.35.0/30  1.1.1.15                 0    150      0 301 520 i
+ *>  210.210.210.210/32
+                       0.0.0.0                  0         32768 i
+
+
+Теперь, все маршруты, полученные от соседа 1.1.1.15 будут иметь local-preference в значении 150, то есть они будут более приоритетны по отношению к обычным маршрутам, у которых значение по умолчанию 100
+---------------------------------------------------------------------------
+
+R14(config-router)#do traceroute 77.77.77.10 sour e0/2
+Type escape sequence to abort.
+Tracing the route to 77.77.77.10
+VRF info: (vrf in name/id, vrf out name/id)
+  1 10.10.10.26 [AS 301] 1 msec 1 msec 0 msec
+  2 111.111.111.2 [AS 301] 1 msec 0 msec 1 msec
+  3 111.111.111.6 [AS 301] 1 msec 0 msec 1 msec
+  4 77.77.77.10 [AS 520] 1 msec *  1 msec
+  
+ Проверка до СПБ и как видно , он ходит через R15.
 
 ```
 
-
-
-R15
+Теперь покажу настройку R15
 
 ```
 R15(config-router)#do sh run | s bgp
 router bgp 1001
  bgp router-id 15.15.15.15
  bgp log-neighbor-changes
+ network 215.215.215.215 mask 255.255.255.255
  neighbor 1.1.1.14 remote-as 1001
- neighbor 1.1.1.14 update-source Loopback0
- neighbor 1.1.1.14 route-map LP in
+ neighbor 1.1.1.14 next-hop-self
  neighbor 111.111.111.2 remote-as 301
- neighbor 111.111.111.2 route-map SET_ASPATH in
+
+
+ ---------------------------------------------------------------------------
+интерфейс для следующей лабы.
+
+interface Loopback1
+ ip address 215.215.215.215 255.255.255.255
 
  ---------------------------------------------------------------------------
  
-route-map LP permit 10
- set local-preference 150
-
-route-map SET_ASPATH permit 10
- set as-path prepend 1001 1001 1001
- ---------------------------------------------------------------------------
- 
- R15(config-router)#do show ip bgp
-
-BGP table version is 11, local router ID is 15.15.15.15
+ R15(config-router)#do sh ip bgp
+BGP table version is 14, local router ID is 15.15.15.15
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
               r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
               x best-external, a additional-path, c RIB-compressed,
@@ -234,26 +263,22 @@ Origin codes: i - IGP, e - EGP, ? - incomplete
 RPKI validation codes: V valid, I invalid, N Not found
 
      Network          Next Hop            Metric LocPrf Weight Path
- *>i 77.77.77.8/30    1.1.1.14                 0    150      0 101 520 i
- *                    111.111.111.2                          0 1001 1001 1001 301 520 i
- *>i 77.77.77.12/30   1.1.1.14                 0    150      0 101 520 i
- *                    111.111.111.2                          0 1001 1001 1001 301 520 i
- *>i 100.100.100.0/30 1.1.1.14                 0    150      0 101 i
- *                    111.111.111.2                          0 1001 1001 1001 301 101 i
- *>i 100.100.100.4/30 1.1.1.14                 0    150      0 101 i
- *                    111.111.111.2                          0 1001 1001 1001 301 101 i
- *>i 110.110.110.0/30 1.1.1.14                 0    150      0 101 301 i
- *                    111.111.111.2            0             0 1001 1001 1001 301 i
- *>i 111.110.35.8/30  1.1.1.14                 0    150      0 101 520 i
- *                    111.111.111.2                          0 1001 1001 1001 301 520 i
- *>i 111.110.35.12/30 1.1.1.14                 0    150      0 101 520 i
- *                    111.111.111.2                          0 1001 1001 1001 301 520 i
- r>i 111.111.111.0/30 1.1.1.14                 0    150      0 101 301 i
- r                    111.111.111.2            0             0 1001 1001 1001 301 i
- *>i 111.111.111.4/30 1.1.1.14                 0    150      0 101 301 i
- *                    111.111.111.2            0             0 1001 1001 1001 301 i
- *>i 210.110.35.0/30  1.1.1.14                 0    150      0 101 520 i
- *                    111.111.111.2                          0 1001 1001 1001 301 520 i
+ r>  0.0.0.0          111.111.111.2                          0 301 i
+ *>  77.77.77.8/30    111.111.111.2                          0 301 520 i
+ *>  77.77.77.12/30   111.111.111.2                          0 301 520 i
+ *>  100.100.100.0/30 111.111.111.2                          0 301 101 i
+ *>  100.100.100.4/30 111.111.111.2                          0 301 101 i
+ *>  110.110.110.0/30 111.111.111.2            0             0 301 i
+ *>  111.110.35.8/30  111.111.111.2                          0 301 520 i
+ *>  111.110.35.12/30 111.111.111.2                          0 301 520 i
+ r>  111.111.111.0/30 111.111.111.2            0             0 301 i
+ *>  111.111.111.4/30 111.111.111.2            0             0 301 i
+ *>  210.110.35.0/30  111.111.111.2                          0 301 520 i
+ *>i 210.210.210.210/32
+                       1.1.1.14                 0    100      0 i
+ *>  215.215.215.215/32
+                       0.0.0.0                  0         32768 i
+
 ```
 
 ### В офисе С.-Петербург работает протокол iBGP. (Не использовать протокол OSPF)

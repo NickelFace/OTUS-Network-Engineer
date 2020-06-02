@@ -162,18 +162,88 @@ R18
 
 ```
 Создаем prefix-list :
-R18(config)#ip prefix-list DEFAULT seq 5 permit  77.77.77.8/30
-R18(config)#ip prefix-list DEFAULT seq 10 permit  77.77.77.12/30
+ip prefix-list DEFAULT seq 5 permit 77.77.77.8/30 le 32
+ip prefix-list DEFAULT seq 10 permit 77.77.77.12/30 le 32
+ip prefix-list DEFAULT seq 15 deny 0.0.0.0/0 le 32
+
+Прикрепляем его к route-map:
+route-map FILTER permit 10
+ match ip address prefix-list DEFAULT
+
 ------------------------------------------------
 router bgp 2042
- neighbor 77.77.77.9 prefix-list DEFAULT out
- neighbor 77.77.77.13 prefix-list DEFAULT out
+ neighbor 77.77.77.9 route-map FILTER out
+ neighbor 77.77.77.13 route-map FILTER out
 ------------------------------------------------
 ```
 
-В конце prefix-list есть неявное dany any , поэтому все остальные маршруты до провайдера будут резаться.
+А теперь проверка:
 
-Показывать таблицу bgp нет смысла, потому что эти сети в них зародились, а значит следующий  next-hop будет 0.0.0.0
+```
+Работу правила я проверил  поднятием Loopback interface 1 на R18
+
+interface Loopback1
+ ip address 215.215.215.215 255.255.255.255
+ ------------------------------------------------
+ R18(config-router)#do sh ip bgp
+BGP table version is 12, local router ID is 18.18.18.18
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
+              r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
+              x best-external, a additional-path, c RIB-compressed,
+Origin codes: i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+
+     Network          Next Hop            Metric LocPrf Weight Path
+ r   77.77.77.8/30    77.77.77.13                            0 520 i
+ r>                   77.77.77.9               0             0 520 i
+ r   77.77.77.12/30   77.77.77.9                             0 520 i
+ r>                   77.77.77.13              0             0 520 i
+ *   100.100.100.0/30 77.77.77.9                             0 520 101 i
+ *>                   77.77.77.13                            0 520 101 i
+ *   100.100.100.4/30 77.77.77.9                             0 520 101 i
+ *>                   77.77.77.13                            0 520 101 i
+ *   110.110.110.0/30 77.77.77.13                            0 520 301 i
+ *>                   77.77.77.9                             0 520 301 i
+ *   111.110.35.8/30  77.77.77.9                             0 520 i
+ *>                   77.77.77.13                            0 520 i
+ *   111.110.35.12/30 77.77.77.9                             0 520 i
+ *>                   77.77.77.13              0             0 520 i
+ *   111.111.111.0/30 77.77.77.13                            0 520 301 i
+ *>                   77.77.77.9                             0 520 301 i
+ *   111.111.111.4/30 77.77.77.13                            0 520 301 i
+ *>                   77.77.77.9                             0 520 301 i
+ *   210.110.35.0/30  77.77.77.9                             0 520 i
+ *>                   77.77.77.13                            0 520 i
+ *>  215.215.215.215/32
+                       0.0.0.0                  0         32768 i
+
+ ----------------------------------------------------------------------
+ Теперь посмотрим,что приходит к провайдеру Триада (R24)
+ R24#sh ip bgp
+BGP table version is 11, local router ID is 24.24.24.24
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
+              r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
+              x best-external, a additional-path, c RIB-compressed,
+Origin codes: i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+
+     Network          Next Hop            Metric LocPrf Weight Path
+ *>  77.77.77.8/30    0.0.0.0                  0         32768 i
+ *>i 77.77.77.12/30   50.0.26.1                0    100      0 i
+ *   100.100.100.0/30 111.111.111.5                          0 301 101 i
+ *>i                  50.0.23.1                0    100      0 101 i
+ *   100.100.100.4/30 111.111.111.5                          0 301 101 i
+ *>i                  50.0.23.1                0    100      0 101 i
+ *>  110.110.110.0/30 111.111.111.5            0             0 301 i
+ *>i 111.110.35.8/30  50.0.25.1                0    100      0 i
+ *>i 111.110.35.12/30 50.0.26.1                0    100      0 i
+ *>  111.111.111.0/30 111.111.111.5            0             0 301 i
+ r>  111.111.111.4/30 111.111.111.5            0             0 301 i
+ *>i 210.110.35.0/30  50.0.25.1                0    100      0 i
+
+```
+
+Как видим, маршрута до 215.215.215.215 наш R18 даже не передаёт. 
 
 ### Настроить провайдера Киторн так, чтобы в офис Москва отдавался только маршрут по-умолчанию
 
