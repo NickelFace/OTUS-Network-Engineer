@@ -173,13 +173,14 @@ router bgp 1001
  bgp router-id 14.14.14.14
  bgp log-neighbor-changes
  network 210.210.210.210 mask 255.255.255.255
- neighbor SPB peer-group
- neighbor SPB remote-as 1001
- neighbor SPB update-source Loopback0
- neighbor SPB next-hop-self
- neighbor 1.1.1.15 peer-group SPB
+ neighbor MSK peer-group
+ neighbor MSK remote-as 1001
+ neighbor MSK update-source Loopback0
+ neighbor MSK next-hop-self
+ neighbor 1.1.1.15 peer-group MSK
  neighbor 1.1.1.15 route-map FILTER in
  neighbor 100.100.100.2 remote-as 101
+ neighbor 100.100.100.2 filter-list 1 out
 
  ----------------------------------------- 
 Создаю  route-map :
@@ -192,8 +193,8 @@ route-map FILTER permit 10
 
  ----------------------------------------- 
  
- R14(config)#do show ip bgp
-BGP table version is 60, local router ID is 14.14.14.14
+ RR14# sh ip bgp
+BGP table version is 13, local router ID is 14.14.14.14
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
               r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
               x best-external, a additional-path, c RIB-compressed,
@@ -201,18 +202,27 @@ Origin codes: i - IGP, e - EGP, ? - incomplete
 RPKI validation codes: V valid, I invalid, N Not found
 
      Network          Next Hop            Metric LocPrf Weight Path
- r>i 0.0.0.0          1.1.1.15                 0    150      0 301 i
- r                    100.100.100.2                          0 101 i
- *>i 77.77.77.8/30    1.1.1.15                 0    150      0 301 520 i
- *>i 77.77.77.12/30   1.1.1.15                 0    150      0 301 520 i
- r>i 100.100.100.0/30 1.1.1.15                 0    150      0 301 101 i
- *>i 100.100.100.4/30 1.1.1.15                 0    150      0 301 101 i
+ *   77.77.77.8/30    100.100.100.2                          0 101 520 i
+ *>i                  1.1.1.15                 0    150      0 301 520 i
+ *   77.77.77.12/30   100.100.100.2                          0 101 520 i
+ *>i                  1.1.1.15                 0    150      0 301 520 i
+ r>  100.100.100.0/30 100.100.100.2            0             0 101 i
+ *>  100.100.100.4/30 100.100.100.2            0             0 101 i
  *>i 110.110.110.0/30 1.1.1.15                 0    150      0 301 i
- *>i 111.110.35.8/30  1.1.1.15                 0    150      0 301 520 i
- *>i 111.110.35.12/30 1.1.1.15                 0    150      0 301 520 i
+ *                    100.100.100.2                          0 101 301 i
+ *   111.110.35.8/30  100.100.100.2                          0 101 520 i
+ *>i                  1.1.1.15                 0    150      0 301 520 i
+ *   111.110.35.12/30 100.100.100.2                          0 101 520 i
+ *>i                  1.1.1.15                 0    150      0 301 520 i
  *>i 111.111.111.0/30 1.1.1.15                 0    150      0 301 i
+ *                    100.100.100.2                          0 101 301 i
  *>i 111.111.111.4/30 1.1.1.15                 0    150      0 301 i
- *>i 210.110.35.0/30  1.1.1.15                 0    150      0 301 520 i
+ *                    100.100.100.2                          0 101 301 i
+ *   115.115.115.115/32
+                       100.100.100.2                          0 101 520 2042 i
+ *>i                  1.1.1.15                 0    150      0 301 520 2042 i
+ *   210.110.35.0/30  100.100.100.2                          0 101 520 i
+ *>i                  1.1.1.15                 0    150      0 301 520 i
  *>  210.210.210.210/32
                        0.0.0.0                  0         32768 i
 
@@ -244,11 +254,10 @@ router bgp 1001
  neighbor 1.1.1.14 remote-as 1001
  neighbor 1.1.1.14 next-hop-self
  neighbor 111.111.111.2 remote-as 301
-
-
+ neighbor 111.111.111.2 filter-list 1 out
+ 
  ---------------------------------------------------------------------------
 интерфейс для следующей лабы.
-
 interface Loopback1
  ip address 215.215.215.215 255.255.255.255
 
@@ -279,6 +288,30 @@ RPKI validation codes: V valid, I invalid, N Not found
  *>  215.215.215.215/32
                        0.0.0.0                  0         32768 i
 
+```
+
+**Как видно R15(МСК) - R21(ЛАМАС) и так приоритетный маршрут,проверим это трассировкой R14 до дальних узлов**
+
+```
+R14#traceroute 111.110.35.13
+Type escape sequence to abort.
+Tracing the route to 111.110.35.13
+VRF info: (vrf in name/id, vrf out name/id)
+  1 10.10.10.26 0 msec 0 msec 0 msec
+  2 111.111.111.2 [AS 301] 1 msec 0 msec 1 msec
+  3 111.111.111.6 [AS 301] 1 msec 1 msec 1 msec
+  4 10.10.30.14 1 msec *  2 msec
+Это край Триады в сторону Чукорды
+
+R14#traceroute 115.115.115.115
+Type escape sequence to abort.
+Tracing the route to 115.115.115.115
+VRF info: (vrf in name/id, vrf out name/id)
+  1 10.10.10.26 2 msec 1 msec 1 msec
+  2 111.111.111.2 [AS 301] 3 msec 1 msec 1 msec
+  3 111.111.111.6 [AS 301] 2 msec 2 msec 1 msec
+  4 77.77.77.10 [AS 520] 2 msec *  1 msec
+А это поднятый Loopback который анонсирует СПб
 ```
 
 ### В офисе С.-Петербург работает протокол iBGP. (Не использовать протокол OSPF)
