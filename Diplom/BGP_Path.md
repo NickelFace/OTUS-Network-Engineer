@@ -20,84 +20,53 @@
 R14
 
 ```
-Создаем As-path list:
-ip as-path access-list 1 deny ^$
-------------------------------------------------
-Применим As-path list как это указанно в задании:
 router bgp 1001
+ bgp router-id 14.14.14.14
+ bgp log-neighbor-changes
+ network 200.20.20.0 mask 255.255.252.0 // "Эта подсеть была выдана IANA"
+ no network 214.214.214.214 mask 255.255.255.255
+ no network 215.215.215.215 mask 255.255.255.255
+ no network 219.219.219.219 mask 255.255.255.255
+ neighbor MSK peer-group
+ neighbor MSK remote-as 1001
+ neighbor MSK update-source Loopback0
+ neighbor MSK next-hop-self
+ neighbor 1.1.1.15 peer-group MSK
+ neighbor 100.100.100.2 remote-as 101
  neighbor 100.100.100.2 filter-list 1 out
-------------------------------------------------
-R14(config-router)#do clear ip bgp * out
-------------------------------------------------
-R14(config)#do sh ip bgp
-BGP table version is 15, local router ID is 14.14.14.14
-Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
-              r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
-              x best-external, a additional-path, c RIB-compressed,
-Origin codes: i - IGP, e - EGP, ? - incomplete
-RPKI validation codes: V valid, I invalid, N Not found
 
-     Network          Next Hop            Metric LocPrf Weight Path
- r>i 0.0.0.0          1.1.1.15                 0    150      0 301 i
- r                    100.100.100.2                          0 101 i
- *>i 77.77.77.8/30    1.1.1.15                 0    150      0 301 520 i
- *>i 77.77.77.12/30   1.1.1.15                 0    150      0 301 520 i
- r>i 100.100.100.0/30 1.1.1.15                 0    150      0 301 101 i
- *>i 100.100.100.4/30 1.1.1.15                 0    150      0 301 101 i
- *>i 110.110.110.0/30 1.1.1.15                 0    150      0 301 i
- *>i 111.110.35.8/30  1.1.1.15                 0    150      0 301 520 i
- *>i 111.110.35.12/30 1.1.1.15                 0    150      0 301 520 i
- *>i 111.111.111.0/30 1.1.1.15                 0    150      0 301 i
- *>i 111.111.111.4/30 1.1.1.15                 0    150      0 301 i
- *>i 210.110.35.0/30  1.1.1.15                 0    150      0 301 520 i
- *>  210.210.210.210/32
-                       0.0.0.0                  0         32768 i
- *>i 215.215.215.215/32
-                       1.1.1.15                 0    150      0 i
- --------------------------------------------------------------------------
- 
- 210.210.210.210/32 и 215.215.215.215/32 это поднятые Loopback interface на R14/R15 для проверки фильтрации маршрутов                  
+ip as-path access-list 1 permit ^$
+ip as-path access-list 1 deny .*
+
+------------------------------------------------
+interface Loopback14
+ ip address 200.20.20.14 255.255.252.0
+
+
 ```
 
 R15
 
 ```
-Создаем As-path list:
-ip as-path access-list 1 deny ^$
-------------------------------------------------
-Применим As-path list как это указанно в задании:
 router bgp 1001
+ bgp router-id 15.15.15.15
+ bgp log-neighbor-changes
+ network 200.20.20.0 mask 255.255.252.0
+ no network 215.215.215.215 mask 255.255.255.255
+ no network 219.219.219.219 mask 255.255.255.255
+ neighbor 1.1.1.14 remote-as 1001
+ neighbor 1.1.1.14 next-hop-self
+ neighbor 111.111.111.2 remote-as 301
+ neighbor 111.111.111.2 route-map LP in
  neighbor 111.111.111.2 filter-list 1 out
-------------------------------------------------
-clear ip bgp * out
-------------------------------------------------
-R15(config-router)#do sh ip bgp
-BGP table version is 11, local router ID is 15.15.15.15
-Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
-              r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
-              x best-external, a additional-path, c RIB-compressed,
-Origin codes: i - IGP, e - EGP, ? - incomplete
-RPKI validation codes: V valid, I invalid, N Not found
 
-     Network          Next Hop            Metric LocPrf Weight Path
- r>  0.0.0.0          111.111.111.2                          0 301 i
- *>  77.77.77.8/30    111.111.111.2                          0 301 520 i
- *>  77.77.77.12/30   111.111.111.2                          0 301 520 i
- *>  100.100.100.0/30 111.111.111.2                          0 301 101 i
- *>  100.100.100.4/30 111.111.111.2                          0 301 101 i
- *>  110.110.110.0/30 111.111.111.2            0             0 301 i
- *>  111.110.35.8/30  111.111.111.2                          0 301 520 i
- *>  111.110.35.12/30 111.111.111.2                          0 301 520 i
- r>  111.111.111.0/30 111.111.111.2            0             0 301 i
- *>  111.111.111.4/30 111.111.111.2            0             0 301 i
- *>  210.110.35.0/30  111.111.111.2                          0 301 520 i
- *>i 210.210.210.210/32
-                       1.1.1.14                 0    100      0 i
- *>  215.215.215.215/32
-                       0.0.0.0                  0         32768 i
---------------------------------------------------------------------------
- 
- 210.210.210.210/32 и 215.215.215.215/32 это поднятые Loopback interface на R14/R15 для проверки фильтрации маршрутов 
+ip as-path access-list 1 permit ^$
+ip as-path access-list 1 deny .*
+
+------------------------------------------------
+interface Loopback15
+ ip address 200.20.20.15 255.255.252.0
+
 ```
 
 **Теперь проверим провайдерские роутеры на наличие маршрутов**
@@ -105,8 +74,8 @@ RPKI validation codes: V valid, I invalid, N Not found
 R22
 
 ```
-R22#sh ip bgp
-BGP table version is 40, local router ID is 22.22.22.22
+R22#show ip bgp
+BGP table version is 47, local router ID is 110.110.110.1
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
               r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
               x best-external, a additional-path, c RIB-compressed,
@@ -114,7 +83,6 @@ Origin codes: i - IGP, e - EGP, ? - incomplete
 RPKI validation codes: V valid, I invalid, N Not found
 
      Network          Next Hop            Metric LocPrf Weight Path
-     0.0.0.0          0.0.0.0                                0 i
  *   77.77.77.8/30    110.110.110.2                          0 301 520 i
  *>                   100.100.100.6                          0 520 i
  *   77.77.77.12/30   110.110.110.2                          0 301 520 i
@@ -131,17 +99,20 @@ RPKI validation codes: V valid, I invalid, N Not found
  *>                   110.110.110.2            0             0 301 i
  *   111.111.111.4/30 100.100.100.6                          0 520 301 i
  *>                   110.110.110.2            0             0 301 i
+ *   200.20.20.0/22   110.110.110.2                          0 301 1001 i
+ *>                   100.100.100.1            0             0 1001 i
  *   210.110.35.0/30  110.110.110.2                          0 301 520 i
  *>                   100.100.100.6                          0 520 i
+
 ------------------------------------------------------------------------------
-Как видим у нас отсутствуют маршруты 210.210.210.210/32 и 215.215.215.215/32 
+Как видно из вывода АС 1001 анонсирует только свои сети и не является транзитом для других
 ```
 
 R21
 
 ```
-R21(config-router)#do sh ip bgp
-BGP table version is 43, local router ID is 21.21.21.21
+R21#sh ip bgp
+BGP table version is 17, local router ID is 111.111.111.5
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
               r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
               x best-external, a additional-path, c RIB-compressed,
@@ -149,15 +120,14 @@ Origin codes: i - IGP, e - EGP, ? - incomplete
 RPKI validation codes: V valid, I invalid, N Not found
 
      Network          Next Hop            Metric LocPrf Weight Path
-     0.0.0.0          0.0.0.0                                0 i
  *   77.77.77.8/30    110.110.110.1                          0 101 520 i
  *>                   111.111.111.6            0             0 520 i
  *   77.77.77.12/30   110.110.110.1                          0 101 520 i
  *>                   111.111.111.6                          0 520 i
- *   100.100.100.0/30 111.111.111.6                          0 520 101 i
- *>                   110.110.110.1            0             0 101 i
- *   100.100.100.4/30 111.111.111.6                          0 520 101 i
- *>                   110.110.110.1            0             0 101 i
+ *>  100.100.100.0/30 110.110.110.1            0             0 101 i
+ *                    111.111.111.6                          0 520 101 i
+ *>  100.100.100.4/30 110.110.110.1            0             0 101 i
+ *                    111.111.111.6                          0 520 101 i
  *>  110.110.110.0/30 0.0.0.0                  0         32768 i
  *   111.110.35.8/30  110.110.110.1                          0 101 520 i
  *>                   111.111.111.6                          0 520 i
@@ -165,10 +135,13 @@ RPKI validation codes: V valid, I invalid, N Not found
  *>                   111.111.111.6                          0 520 i
  *>  111.111.111.0/30 0.0.0.0                  0         32768 i
  *>  111.111.111.4/30 0.0.0.0                  0         32768 i
+ *>  200.20.20.0/22   111.111.111.1            0             0 1001 i
+ *                    110.110.110.1                          0 101 1001 i
  *   210.110.35.0/30  110.110.110.1                          0 101 520 i
  *>                   111.111.111.6                          0 520 i
+
 ------------------------------------------------------------------------------
-Как видим у нас отсутствуют маршруты 210.210.210.210/32 и 215.215.215.215/32 
+Картина аналогичная предыдущему выводу
 ```
 
 ### Настроить фильтрацию в офисе С.-Петербург так, чтобы не появилось транзитного трафика(Prefix-list)
@@ -176,20 +149,36 @@ RPKI validation codes: V valid, I invalid, N Not found
 R18
 
 ```
+interface Loopback18
+ ip address 100.10.8.18 255.255.252.0
+-------------------------------------------------
+
+ip as-path access-list 1 permit ^$
+ip as-path access-list 1 deny .*
+
 Создаем prefix-list :
-ip prefix-list DEFAULT seq 5 permit  77.77.77.8/30 le 32
-ip prefix-list DEFAULT seq 10 permit  77.77.77.12/30 le 32
-ip prefix-list DEFAULT seq 11 permit  115.115.115.115/32
-ip prefix-list DEFAULT seq 15 deny 0.0.0.0/0 le 32
+ip prefix-list DEFAULT seq 5 permit 77.77.77.8/30 le 32
+ip prefix-list DEFAULT seq 10 permit 77.77.77.12/30 le 32
+ip prefix-list DEFAULT seq 15 permit 100.10.8.0/22 le 32 
+ip prefix-list DEFAULT seq 20 deny 0.0.0.0/0 le 32
 
 Прикрепляем его к route-map:
 route-map FILTER permit 10
  match ip address prefix-list DEFAULT
-
 ------------------------------------------------
 router bgp 2042
+ template peer-policy TRIADA_POLICY
+  route-map FILTER out
+  filter-list 1 out
+ exit-peer-policy
+ !
+ template peer-session TRIADA
+  remote-as 520
+ exit-peer-session
+ !
  bgp router-id 18.18.18.18
  bgp log-neighbor-changes
+ network 100.10.8.0 mask 255.255.252.0  // "Эта подсеть была выдана IANA"
  neighbor SPB peer-group
  neighbor SPB remote-as 2042
  neighbor SPB update-source Loopback0
@@ -197,35 +186,19 @@ router bgp 2042
  neighbor 1.1.2.16 peer-group SPB
  neighbor 1.1.2.17 peer-group SPB
  neighbor 1.1.2.32 peer-group SPB
-neighbor 77.77.77.9 inherit peer-session TRIADA
-neighbor 77.77.77.9 inherit peer-policy TRIADA_POLICY
-neighbor 77.77.77.13 inherit peer-session TRIADA
-neighbor 77.77.77.13 inherit peer-policy TRIADA_POLICY
-
- template peer-policy TRIADA_POLICY
-  route-map FILTER out
- template peer-session TRIADA
-  remote-as 520
-
-template peer-session SPB
-  remote-as 2042
-  update-source Loopback0
-
- template peer-policy POLICY
-  next-hop-self
+ neighbor 77.77.77.9 inherit peer-session TRIADA
+ neighbor 77.77.77.9 inherit peer-policy TRIADA_POLICY
+ neighbor 77.77.77.13 inherit peer-session TRIADA
+ neighbor 77.77.77.13 inherit peer-policy TRIADA_POLICY
 
 ------------------------------------------------
 ```
 
-А теперь проверка:
+Теперь посмотрим,что приходит у провайдера Триада (R24/R26)
 
 ```
-Работу правила я проверил  поднятием Loopback interface 1 на R18
-interface Loopback1
- ip address 115.115.115.115 255.255.255.255
- ------------------------------------------------
- R18(config-router)#do sh ip bgp
-BGP table version is 12, local router ID is 18.18.18.18
+R24#show ip bgp
+BGP table version is 47, local router ID is 24.24.24.24
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
               r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
               x best-external, a additional-path, c RIB-compressed,
@@ -233,50 +206,53 @@ Origin codes: i - IGP, e - EGP, ? - incomplete
 RPKI validation codes: V valid, I invalid, N Not found
 
      Network          Next Hop            Metric LocPrf Weight Path
- r   77.77.77.8/30    77.77.77.13                            0 520 i
- r>                   77.77.77.9               0             0 520 i
- r   77.77.77.12/30   77.77.77.9                             0 520 i
- r>                   77.77.77.13              0             0 520 i
- *   100.100.100.0/30 77.77.77.9                             0 520 101 i
- *>                   77.77.77.13                            0 520 101 i
- *   100.100.100.4/30 77.77.77.9                             0 520 101 i
- *>                   77.77.77.13                            0 520 101 i
- *   110.110.110.0/30 77.77.77.13                            0 520 301 i
- *>                   77.77.77.9                             0 520 301 i
- *   111.110.35.8/30  77.77.77.9                             0 520 i
- *>                   77.77.77.13                            0 520 i
- *   111.110.35.12/30 77.77.77.9                             0 520 i
- *>                   77.77.77.13              0             0 520 i
- *   111.111.111.0/30 77.77.77.13                            0 520 301 i
- *>                   77.77.77.9                             0 520 301 i
- *   111.111.111.4/30 77.77.77.13                            0 520 301 i
- *>                   77.77.77.9                             0 520 301 i
- *   210.110.35.0/30  77.77.77.9                             0 520 i
- *>                   77.77.77.13                            0 520 i
- *>  215.215.215.215/32
-                       0.0.0.0                  0         32768 i
-
-
- ----------------------------------------------------------------------
- 
-Теперь посмотрим,что приходит у провайдера Триада (R24/R26)
-R24#sh ip bgp
- ... (пропускаем лишний вывод)
- * i 115.115.115.115/32
-                       77.77.77.14              0    100      0 2042 i
+ *>  77.77.77.8/30    0.0.0.0                  0         32768 i
+ *>i 77.77.77.12/30   50.0.26.1                0    100      0 i
+ * i 100.10.8.0/22    50.0.26.1                0    100      0 2042 i
  *>                   77.77.77.10              0             0 2042 i
+ *   100.100.100.0/30 111.111.111.5                          0 301 101 i
+ *>i                  50.0.23.1                0    100      0 101 i
+ *   100.100.100.4/30 111.111.111.5                          0 301 101 i
+ *>i                  50.0.23.1                0    100      0 101 i
+ *>  110.110.110.0/30 111.111.111.5            0             0 301 i
+ *>i 111.110.35.8/30  50.0.25.1                0    100      0 i
+ *>i 111.110.35.12/30 50.0.26.1                0    100      0 i
+ *>  111.111.111.0/30 111.111.111.5            0             0 301 i
+ r>  111.111.111.4/30 111.111.111.5            0             0 301 i
+ *>  200.20.20.0/22   111.111.111.5                          0 301 1001 i
+ * i                  50.0.23.1                0    100      0 101 1001 i
+ *>i 210.110.35.0/30  50.0.25.1                0    100      0 i
 
+Нас лишь интересует маршрут 100.10.8.0/22 за АС 2042  
 ---------------------------------------------------------------------------
-С R18 сеть 2115.115.115.115/32  попадает к провайдеру Триада(R26 тот же результат)
-А значит мы настроили prefix-list правильно.
-Заодно можно проверить дойдет ли он до МСК
+R26#show ip bgp
+BGP table version is 55, local router ID is 26.26.26.26
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
+              r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
+              x best-external, a additional-path, c RIB-compressed,
+Origin codes: i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
 
-R14#sh ip bgp
- ... (пропускаем лишний вывод)
- *>  115.115.115.115/32
-                       100.100.100.2                          0 101 520 2042 i
+     Network          Next Hop            Metric LocPrf Weight Path
+ *>i 77.77.77.8/30    50.0.24.1                0    100      0 i
+ *>  77.77.77.12/30   0.0.0.0                  0         32768 i
+ * i 100.10.8.0/22    50.0.24.1                0    100      0 2042 i
+ *>                   77.77.77.14              0             0 2042 i
+ *>i 100.100.100.0/30 50.0.23.1                0    100      0 101 i
+ *>i 100.100.100.4/30 50.0.23.1                0    100      0 101 i
+ *>i 110.110.110.0/30 50.0.24.1                0    100      0 301 i
+ *>i 111.110.35.8/30  50.0.25.1                0    100      0 i
+ *>  111.110.35.12/30 0.0.0.0                  0         32768 i
+ *>i 111.111.111.0/30 50.0.24.1                0    100      0 301 i
+ *>i 111.111.111.4/30 50.0.24.1                0    100      0 301 i
+ *>i 200.20.20.0/22   50.0.24.1                0    100      0 301 1001 i
+ * i                  50.0.23.1                0    100      0 101 1001 i
+ *>i 210.110.35.0/30  50.0.25.1                0    100      0 i
+-----------------------------------------------------------------------
+Нас лишь интересует маршрут 100.10.8.0/22 за АС 2042 
+Как видно из вывода мы смогли выполнить фильтрацию с помощью Prefix-list
+Воспользоваться as-path access-list задании не запрещалось.
 
-Как видим,эта сеть и доступна в Москве 
 ```
 
 ### Настроить провайдера Киторн так, чтобы в офис Москва отдавался только маршрут по-умолчанию
@@ -301,8 +277,8 @@ router bgp 101
 R14
 
 ```
-R14(config)#do sh ip bgp
-BGP table version is 15, local router ID is 14.14.14.14
+R14(config-if)#do sh ip bgp
+BGP table version is 25, local router ID is 14.14.14.14
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
               r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
               x best-external, a additional-path, c RIB-compressed,
@@ -310,25 +286,21 @@ Origin codes: i - IGP, e - EGP, ? - incomplete
 RPKI validation codes: V valid, I invalid, N Not found
 
      Network          Next Hop            Metric LocPrf Weight Path
- r>i 0.0.0.0          1.1.1.15                 0    150      0 301 i
- r                    100.100.100.2                          0 101 i
+ r>  0.0.0.0          100.100.100.2                          0 101 i
  *>i 77.77.77.8/30    1.1.1.15                 0    150      0 301 520 i
  *>i 77.77.77.12/30   1.1.1.15                 0    150      0 301 520 i
- r>i 100.100.100.0/30 1.1.1.15                 0    150      0 301 101 i
- *>i 100.100.100.4/30 1.1.1.15                 0    150      0 301 101 i
+ *>i 100.10.8.0/22    1.1.1.15                 0    150      0 301 520 2042 i
  *>i 110.110.110.0/30 1.1.1.15                 0    150      0 301 i
  *>i 111.110.35.8/30  1.1.1.15                 0    150      0 301 520 i
  *>i 111.110.35.12/30 1.1.1.15                 0    150      0 301 520 i
  *>i 111.111.111.0/30 1.1.1.15                 0    150      0 301 i
  *>i 111.111.111.4/30 1.1.1.15                 0    150      0 301 i
+ * i 200.20.20.0/22   1.1.1.15                 0    100      0 i
+ *>                   0.0.0.0                  0         32768 i
  *>i 210.110.35.0/30  1.1.1.15                 0    150      0 301 520 i
- *>  210.210.210.210/32
-                       0.0.0.0                  0         32768 i
- *>i 215.215.215.215/32
-                       1.1.1.15                 0    150      0 i
 
 ---------------------------------------------------------------------------
-Как видно из вывода мы от соседа 100.100.100.2 получаем 0.0.0.0 ,но он не попадает таблицу маршрутизации
+Маршрут по умолчанию мы смогли передать,значит задача выполнена
 ```
 
 
