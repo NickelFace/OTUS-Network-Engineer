@@ -126,22 +126,25 @@ R15
 
 ```
 interface Loopback15
- ip address 215.215.215.215 255.255.255.255
+ ip address 200.20.20.15 255.255.252.0
 
-ip nat inside source static 1.1.1.20 215.215.215.215
+ip nat inside source static 1.1.1.20 200.20.20.20
 
 router bgp 1001
- network 215.215.215.215 mask 255.255.255.255
+ network 200.20.20.0 mask 255.255.252.0
  
 ```
 
 R14
 
 ```
- ip nat inside source static 1.1.1.20 215.215.215.215
+interface Loopback14
+ ip address 200.20.20.14 255.255.252.0
+
+ ip nat inside source static 1.1.1.20 200.20.20.20
 
 router bgp 1001
- network 215.215.215.215 mask 255.255.255.255
+  network 200.20.20.0 mask 255.255.252.0
 ```
 
 Проверку в программе WireShark выполнил ,трафик sniffer смотрел на R20 на interface e0/0
@@ -151,22 +154,26 @@ router bgp 1001
  R15
 
 ```
-interface Loopback19
- ip address 219.219.219.219 255.255.255.255
+interface Loopback15
+ ip address 200.20.20.15 255.255.252.0
 
- router bgp 1001
- 	network 219.219.219.219 mask 255.255.255.255
+router bgp 1001
+ network 200.20.20.0 mask 255.255.252.0
 
-ip nat inside source static tcp 1.1.1.19 22 219.219.219.219 22
+ip nat inside source static tcp 1.1.1.19 22 200.20.20.19 22 extendable
+
 ```
 
 R14
 
 ```
-router bgp 1001
- 	network 219.219.219.219 mask 255.255.255.255
+interface Loopback14
+ ip address 200.20.20.14 255.255.252.0
 
-ip nat inside source static tcp 1.1.1.19 22 219.219.219.219 22
+router bgp 1001
+ 	network 200.20.20.0 mask 255.255.252.0
+
+ip nat inside source static tcp 1.1.1.19 22 200.20.20.19 22 extendable
 ```
 
 R19
