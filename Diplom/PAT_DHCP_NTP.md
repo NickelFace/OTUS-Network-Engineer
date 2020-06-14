@@ -1,4 +1,4 @@
-# ntpОсновные протоколы сети интернет 
+# Основные протоколы сети интернет 
 
 ## Домашнее задание
 
@@ -647,68 +647,6 @@ Sending 5, 100-byte ICMP Echos to 77.77.77.14, timeout is 2 seconds:
 !!!!!
 Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/2 ms
 ```
-
-
-**Столкнулся  проблемой ,устройства которые за NAT в МСК не могут пропинговать только сеть Лабытнанги(другие могут)**
-
-```
-R20>ping 210.110.35.2
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 210.110.35.2, timeout is 2 seconds:
-.....
-Success rate is 0 percent (0/5)
-R20>trace 210.110.35.2
-Type escape sequence to abort.
-Tracing the route to 210.110.35.2
-VRF info: (vrf in name/id, vrf out name/id)
-  1 10.10.10.1 1 msec 1 msec 0 msec
-  2 111.111.111.2 1 msec 1 msec 0 msec
-  3 111.111.111.6 1 msec 1 msec 1 msec
-  4  *  *  *
-  5  *  *  *
-  6  *  *
-
-```
-
-Сеть 111.111.111.6 принадлежит R24 ,пробуем пропинговать от него туда и обратно(учитываем NAT)
-
-```
-R24>ping 200.20.20.20 // Статический NAT для R20
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 200.20.20.20, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
-
-R24>traceroute 200.20.20.20
-Type escape sequence to abort.
-Tracing the route to 200.20.20.20
-VRF info: (vrf in name/id, vrf out name/id)
-  1 111.111.111.5 [AS 301] 1 msec 0 msec 1 msec
-  2 111.111.111.1 [AS 301] 1 msec 1 msec 1 msec
-  3 200.20.20.20 [AS 1001] 1 msec *  1 msec
-
-
-R24>ping 210.110.35.2 // сеть Лабытнанги
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 210.110.35.2, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
-
-R24>traceroute 210.110.35.2
-Type escape sequence to abort.
-Tracing the route to 210.110.35.2
-VRF info: (vrf in name/id, vrf out name/id)
-  1 10.10.30.14 1 msec
-    10.10.30.1 0 msec
-    10.10.30.14 1 msec
-  2 10.10.30.6 0 msec
-    10.10.30.9 1 msec
-    10.10.30.6 1 msec
-  3 210.110.35.2 1 msec *  2 msec
-
-```
-
-Я так и не смог понять,в чем собственно причина такого поведения, буду рад ,если поможете разобраться.
 
 ### План работы и изменения зафиксированы в документации
 
