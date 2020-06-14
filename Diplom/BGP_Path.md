@@ -157,8 +157,6 @@ ip as-path access-list 1 permit ^$
 ip as-path access-list 1 deny .*
 
 Создаем prefix-list :
-ip prefix-list DEFAULT seq 5 permit 77.77.77.8/30 le 32
-ip prefix-list DEFAULT seq 10 permit 77.77.77.12/30 le 32
 ip prefix-list DEFAULT seq 15 permit 100.10.8.0/22 le 32 
 ip prefix-list DEFAULT seq 20 deny 0.0.0.0/0 le 32
 
@@ -198,7 +196,7 @@ router bgp 2042
 
 ```
 R24#show ip bgp
-BGP table version is 47, local router ID is 24.24.24.24
+BGP table version is 19, local router ID is 24.24.24.24
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
               r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
               x best-external, a additional-path, c RIB-compressed,
@@ -210,23 +208,23 @@ RPKI validation codes: V valid, I invalid, N Not found
  *>i 77.77.77.12/30   50.0.26.1                0    100      0 i
  * i 100.10.8.0/22    50.0.26.1                0    100      0 2042 i
  *>                   77.77.77.10              0             0 2042 i
- *   100.100.100.0/30 111.111.111.5                          0 301 101 i
- *>i                  50.0.23.1                0    100      0 101 i
- *   100.100.100.4/30 111.111.111.5                          0 301 101 i
- *>i                  50.0.23.1                0    100      0 101 i
+ *>i 100.100.100.0/30 50.0.23.1                0    100      0 101 i
+ *                    111.111.111.5                          0 301 101 i
+ *>i 100.100.100.4/30 50.0.23.1                0    100      0 101 i
+ *                    111.111.111.5                          0 301 101 i
  *>  110.110.110.0/30 111.111.111.5            0             0 301 i
  *>i 111.110.35.8/30  50.0.25.1                0    100      0 i
  *>i 111.110.35.12/30 50.0.26.1                0    100      0 i
  *>  111.111.111.0/30 111.111.111.5            0             0 301 i
  r>  111.111.111.4/30 111.111.111.5            0             0 301 i
- *>  200.20.20.0/22   111.111.111.5                          0 301 1001 i
- * i                  50.0.23.1                0    100      0 101 1001 i
+ * i 200.20.20.0/22   50.0.23.1                0    100      0 101 1001 i
+ *>                   111.111.111.5                          0 301 1001 i
  *>i 210.110.35.0/30  50.0.25.1                0    100      0 i
 
 Нас лишь интересует маршрут 100.10.8.0/22 за АС 2042  
 ---------------------------------------------------------------------------
 R26#show ip bgp
-BGP table version is 55, local router ID is 26.26.26.26
+BGP table version is 26, local router ID is 26.26.26.26
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal,
               r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter,
               x best-external, a additional-path, c RIB-compressed,
@@ -245,14 +243,15 @@ RPKI validation codes: V valid, I invalid, N Not found
  *>  111.110.35.12/30 0.0.0.0                  0         32768 i
  *>i 111.111.111.0/30 50.0.24.1                0    100      0 301 i
  *>i 111.111.111.4/30 50.0.24.1                0    100      0 301 i
- *>i 200.20.20.0/22   50.0.24.1                0    100      0 301 1001 i
- * i                  50.0.23.1                0    100      0 101 1001 i
+ * i 200.20.20.0/22   50.0.23.1                0    100      0 101 1001 i
+ *>i                  50.0.24.1                0    100      0 301 1001 i
  *>i 210.110.35.0/30  50.0.25.1                0    100      0 i
+
 -----------------------------------------------------------------------
-Нас лишь интересует маршрут 100.10.8.0/22 за АС 2042 
+Нас лишь интересует маршрут 100.10.8.0/22 за АС 2042
+
 Как видно из вывода мы смогли выполнить фильтрацию с помощью Prefix-list
 Воспользоваться as-path access-list задании не запрещалось.
-
 ```
 
 ### Настроить провайдера Киторн так, чтобы в офис Москва отдавался только маршрут по-умолчанию
