@@ -271,6 +271,7 @@ R22
 ```
 Создаем prefix-list :
 ip prefix-list ISP seq 5 permit 0.0.0.0/0
+ip prefix-list ISP seq 10 permit 100.10.8.0/22
 ip prefix-list ISP seq 20 deny 0.0.0.0/0 le 32
 
 Прикрепляем его к route-map :
@@ -378,9 +379,11 @@ RPKI validation codes: V valid, I invalid, N Not found
 
      Network          Next Hop            Metric LocPrf Weight Path
  r>  0.0.0.0          100.100.100.2                          0 101 i
- *>i 100.10.8.0/22    1.1.1.15                 0    150      0 301 520 2042 i
+ *   100.10.8.0/22    100.100.100.2                          0 101 520 2042 i
+ *>i                  1.1.1.15                 0    150      0 301 520 2042 i
  * i 200.20.20.0/22   1.1.1.15                 0    100      0 i
  *>                   0.0.0.0                  0         32768 i
+
 ```
 
 ### Все сети в лабораторной работе должны иметь IP связность
