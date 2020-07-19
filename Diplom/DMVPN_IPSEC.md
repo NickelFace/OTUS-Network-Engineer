@@ -24,8 +24,8 @@ interface Tunnel0
  ip address 10.0.0.1 255.255.255.252
  ip mtu 1400
  ip tcp adjust-mss 1360
- tunnel source 111.111.111.1
- tunnel destination 77.77.77.14
+ tunnel source 200.20.20.15
+ tunnel destination 100.10.8.18
 
  crypto isakmp policy 1
  encr 3des
@@ -34,7 +34,7 @@ interface Tunnel0
  group 2
  lifetime 86400
  
-crypto isakmp key cisco address 77.77.77.14
+crypto isakmp key cisco address 100.10.8.18
 
 crypto ipsec transform-set TS esp-3des esp-md5-hmac
  mode transport
@@ -54,8 +54,8 @@ interface Tunnel0
  ip address 10.0.0.2 255.255.255.252
  ip mtu 1400
  ip tcp adjust-mss 1360
- tunnel source 77.77.77.14
- tunnel destination 111.111.111.1
+ tunnel source 100.10.8.18
+ tunnel destination 200.20.20.15
 
 crypto isakmp policy 1
  encr 3des
@@ -64,7 +64,7 @@ crypto isakmp policy 1
  group 2
  lifetime 86400
  
-crypto isakmp key cisco address 111.111.111.1
+crypto isakmp key cisco address 200.20.20.15
 
 crypto ipsec transform-set TS esp-3des esp-md5-hmac
  mode transport
@@ -94,16 +94,18 @@ Sending 5, 100-byte ICMP Echos to 10.0.0.2, timeout is 2 seconds:
 !!!!!
 Success rate is 100 percent (5/5), round-trip min/avg/max = 4/4/5 ms
 
-R18(config-if)#do show crypto session
+R18#show crypto session                                              
 Crypto session current status
 
 Interface: Tunnel0
 Session status: UP-ACTIVE     
-Peer: 111.111.111.1 port 500 
+Peer: 200.20.20.15 port 500 
   Session ID: 0  
-  IKEv1 SA: local 77.77.77.14/500 remote 111.111.111.1/500 Active 
-  IPSEC FLOW: permit 47 host 77.77.77.14 host 111.111.111.1 
-        Active SAs: 2, origin: crypto map
+  IKEv1 SA: local 100.10.8.18/500 remote 200.20.20.15/500 Active 
+  Session ID: 0  
+  IKEv1 SA: local 100.10.8.18/500 remote 200.20.20.15/500 Active 
+  IPSEC FLOW: permit 47 host 100.10.8.18 host 200.20.20.15 
+        Active SAs: 4, origin: crypto map
 ```
 
 
@@ -123,7 +125,7 @@ interface Tunnel0
  ip nhrp network-id 1
  load-interval 30
  keepalive 5 10
- tunnel source Ethernet0/2
+ tunnel source 200.20.20.14
  tunnel mode gre multipoint
  
  
@@ -151,13 +153,13 @@ R27
 
 ```
 interface Tunnel0
- ip address 10.1.0.4 255.255.255.0
+ ip address 10.1.0.3 255.255.255.0
  no ip redirects
  ip mtu 1440
  ip nhrp authentication nhrp1234
  ip nhrp map multicast dynamic
- ip nhrp map 10.1.0.1 100.100.100.1
- ip nhrp map multicast 100.100.100.1
+ ip nhrp map 10.1.0.1 200.20.20.14
+ ip nhrp map multicast 200.20.20.14
  ip nhrp network-id 1
  ip nhrp nhs 10.1.0.1
  ip nhrp registration no-unique
@@ -190,13 +192,13 @@ R28
 
 ```
 interface Tunnel0
- ip address 10.1.0.3 255.255.255.0
+ ip address 10.1.0.2 255.255.255.0
  no ip redirects
  ip mtu 1440
  ip nhrp authentication nhrp1234
  ip nhrp map multicast dynamic
- ip nhrp map 10.1.0.1 100.100.100.1
- ip nhrp map multicast 100.100.100.1
+ ip nhrp map 10.1.0.1 200.20.20.14
+ ip nhrp map multicast 200.20.20.14
  ip nhrp network-id 1
  ip nhrp nhs 10.1.0.1
  ip nhrp registration no-unique
@@ -204,7 +206,6 @@ interface Tunnel0
  keepalive 5 10
  tunnel source Ethernet0/0
  tunnel mode gre multipoint
- tunnel protection ipsec profile protect-gre
  
 crypto isakmp policy 1
  encr 3des
@@ -212,11 +213,9 @@ crypto isakmp policy 1
  authentication pre-share
  group 2  
 crypto isakmp key isakmp1234 address 0.0.0.0        
-         
-         
+                  
 crypto ipsec transform-set TS esp-3des esp-md5-hmac 
- mode tunnel
-         
+ mode tunnel         
          
 crypto ipsec profile protect-gre
  set security-association lifetime seconds 86400
@@ -229,7 +228,7 @@ interface Tunnel0
 Проверка
 
 ```
-R27#show dmvpn            
+R27#show dmvpn   
 Legend: Attrb --> S - Static, D - Dynamic, I - Incomplete
         N - NATed, L - Local, X - No Socket
         T1 - Route Installed, T2 - Nexthop-override
@@ -240,40 +239,42 @@ Legend: Attrb --> S - Static, D - Dynamic, I - Incomplete
 ==========================================================================
 
 Interface: Tunnel0, IPv4 NHRP Details 
-Type:Spoke, NHRP Peers:3, 
+Type:Spoke, NHRP Peers:2, 
 
  # Ent  Peer NBMA Addr Peer Tunnel Add State  UpDn Tm Attrb
  ----- --------------- --------------- ----- -------- -----
-     2 100.100.100.1          10.1.0.1    UP 00:55:19     S
-                              10.1.0.4    UP 00:00:06     D
-     1 77.77.77.10            10.1.0.2    UP 00:19:13     D
-     1 111.110.35.14          10.1.0.3    UP 00:19:11     D
+     2 200.20.20.14           10.1.0.1    UP 01:01:14     S
+                              10.1.0.3    UP 00:00:08     D
+     1 111.110.35.14          10.1.0.2    UP 00:00:10     D
 --------------------------------------------------------------------------------------------------------------------
 R27#show crypto isakmp sa 
 IPv4 Crypto ISAKMP SA
 dst             src             state          conn-id status
-210.110.35.2    111.110.35.14   QM_IDLE           1003 ACTIVE
-111.110.35.14   210.110.35.2    QM_IDLE           1001 ACTIVE
-100.100.100.1   210.110.35.2    QM_IDLE           1002 ACTIVE
+200.20.20.14    210.110.35.2    QM_IDLE           1001 ACTIVE
+210.110.35.2    111.110.35.14   QM_IDLE           1002 ACTIVE
+111.110.35.14   210.110.35.2    QM_IDLE           1003 ACTIVE
 
 IPv6 Crypto ISAKMP SA
+
 
 --------------------------------------------------------------------------------------------------------------------
 R27#ping 10.1.0.1
 Type escape sequence to abort.
 Sending 5, 100-byte ICMP Echos to 10.1.0.1, timeout is 2 seconds:
 !!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 6/6/6 ms
+Success rate is 100 percent (5/5), round-trip min/avg/max = 6/6/7 ms
+
+R27#ping 10.1.0.2
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.1.0.2, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 8/9/10 ms
+
 R27#ping 10.1.0.3
 Type escape sequence to abort.
 Sending 5, 100-byte ICMP Echos to 10.1.0.3, timeout is 2 seconds:
 !!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 5/5/6 ms
-R27#ping 10.1.0.4
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.1.0.4, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 7/7/8 ms 
+Success rate is 100 percent (5/5), round-trip min/avg/max = 7/7/8 ms
 ```
 
 ### План работы и изменения зафиксированы в документации
