@@ -290,11 +290,14 @@ interface Ethernet0/1
 ip dhcp snooping 
 ip dhcp snooping vlan 2
 no ip dhcp snooping information option // Убирает 82 опцию с запроса
-ip dhcp relay information trust-all // таким образом указывается доверенный DHCP сервер, который находится вне канальной среды. 
- 
+
 Проблема в том ,что после указания dhcp snooping vlan 2 (за любой vlan) , коммутатор к dhcp Discover добавляет 82 опцию и такой кадр попадает на уровень Distribution и далее дропается. Поэтому мы задаем данной командой запрет на подобное поведение.
 
-Ограничем количество генерируемых DHCP запросов на определенный порт
+ip dhcp relay information trust-all // таким образом указывается доверенный DHCP сервер, который находится вне канальной среды. 
+
+
+Ограничем количество генерируемых DHCP запросов на определенный порт:
+
 interface Ethernet0/2
  ip dhcp snooping limit rate 10
          
@@ -302,3 +305,6 @@ interface Ethernet0/3
  ip dhcp snooping limit rate 10
 ```
 
+#### **~~IP Source Guard~~**
+
+ функция коммутатора, которая ограничивает IP-трафик на интерфейсах 2го уровня, фильтруя трафик на основании таблицы привязок DHCP snooping и статических соответствий. Функция используется для борьбы с IP-spoofingом.
