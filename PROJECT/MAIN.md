@@ -10,7 +10,7 @@
 2. OSPF и проверка связности
 3. Создание VLAN , работа с HSRP и STP.
 4.  DHCP , а также настройка L2 Security 
-5. FTP , AAA server (Tacacs+) 
+5. FTP , AAA server (Tacacs+) , 3 Distribution block , ISP, PAT
 
 ### Адресация сети предприятия
 
@@ -231,11 +231,11 @@ MTU         : 1500
 
 Далее приступим к настройке коммутируемой среды::
 
-1. Port-security
-2. ~~Storm Control~~
-3. DHCP SNooping 
-4. ~~IP Source Guard~~
-5. Dynamic ARP Inspection
+1. **Port-security**
+2. **~~Storm Control~~**
+3. **DHCP SNooping** 
+4. **~~IP Source Guard~~**
+5. **Dynamic ARP Inspection**
 
 К сожалению ,мне придется отказаться от некоторых технологий по причине не поддержки в данной прошивке устройства.
 
@@ -308,3 +308,158 @@ interface Ethernet0/3
 #### **~~IP Source Guard~~**
 
  функция коммутатора, которая ограничивает IP-трафик на интерфейсах 2го уровня, фильтруя трафик на основании таблицы привязок DHCP snooping и статических соответствий. Функция используется для борьбы с IP-spoofingом.
+
+**AccSW1**
+
+```
+AccSW1(config)#int e0/2
+AccSW1(config-if)#ip verify source port-security 
+```
+
+Так как после ввода данной команды у меня перестаёт ходить трафик ,а troubleshooting не дал результата, то я отказался от данной технологии.
+
+#### **Dynamic ARP Inspection**
+
+ функция коммутатора, предназначенная для защиты от атак с использованием протокола ARP.
+
+**AccSW1**
+
+```
+ip arp inspection vlan 2
+
+interface Ethernet0/0
+ ip arp inspection trust
+!         
+interface Ethernet0/1
+ ip arp inspection trust
+!         
+interface Ethernet0/2
+ ip arp inspection limit rate 2
+!         
+interface Ethernet0/3
+ ip arp inspection limit rate 2
+```
+
+###  ISP и выход в интернет, PAT , FTP , 3 Distribution block (Server Farm) , NTP
+
+![](img/DistributionBlock3.png)
+
+
+
+Выход в интернет реализован через 3  Distribution block , который выходит к  Edge роутерам.  Edge роутеры в свою очередь реализовывают механизм PAT , для преобразования серых адресов в один публичный. Для резервирования ,к провайдеру подключаемся по схеме dual homed.
+
+#### PAT
+
+**E-R1**
+
+```
+Организация PAT:
+
+interface Ethernet0/0
+ ip address 10.0.12.2 255.255.255.252
+ ip nat inside
+         
+interface Ethernet0/1
+ ip address 10.0.13.2 255.255.255.252
+ ip nat inside
+         
+interface Ethernet0/2
+ ip address 212.22.48.6 255.255.255.252
+ ip nat outside
+
+ip nat inside source list 1 interface Ethernet0/2 overload
+ip route 0.0.0.0 0.0.0.0 212.22.48.5
+                
+access-list 1 permit 172.16.0.0 0.0.15.255
+access-list 1 permit 172.20.20.0 0.0.0.255
+```
+
+Провайдер в свою очередь тоже использует NAT(PAT) , но нас это не интересует.
+
+Далее поднимаем Windows Server 2012  и на нём FTP Server.  Данную машину резервируем 2-мя  сетевыми адаптерами типа мост.  И на её основе реализуем отказоустойчивый переход HSRP. 
+
+```
+interface Vlan20
+ ip address 172.20.20.251 255.255.255.0
+ standby 1 ip 172.20.20.1
+ standby 1 priority 150
+ standby 1 preempt
+
+interface Ethernet1/3
+ switchport access vlan 20
+ switchport mode access
+```
+
+Также на каждом блоке организован **Etherchannel** :
+
+#### PAgP
+
+```
+interface Port-channel1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+interface Ethernet1/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+!         
+interface Ethernet1/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode desirable
+ 
+ port-channel load-balance src-dst-mac
+-------------------------------------------------------------------------------- 
+FarmDistSW1# show etherchannel summary 
+Flags:  D - down        P - bundled in port-channel
+        I - stand-alone s - suspended
+        H - Hot-standby (LACP only)
+        R - Layer3      S - Layer2
+        U - in use      f - failed to allocate aggregator
+
+        M - not in use, minimum links not met
+        u - unsuitable for bundling
+        w - waiting to be aggregated
+        d - default port
+
+
+Number of channel-groups in use: 1
+Number of aggregators:           1
+
+Group  Port-channel  Protocol    Ports
+------+-------------+-----------+-----------------------------------------------
+1      Po1(SU)         PAgP      Et1/0(P)    Et1/1(P)    
+```
+
+#### **FTP**
+
+Пропишем на всех устройствах доступ к FTP серверу 
+
+```
+archive   
+ path ftp://admin:cisco@172.20.20.5/FarmDistSW1.txt
+ write-memory
+ time-period 360
+```
+
+#### **NTP**
+
+На Edge роутерах поднимем NTP-server
+
+```
+ntp source Loopback0
+ntp master 5
+ntp peer 5.5.5.8
+ntp server ntp3.stratum2.ru
+ntp server 1.ru.pool.ntp.org prefer
+```
+
+На клиентах
+
+```
+ntp update-calendar
+ntp server 5.5.5.8
+ntp server 5.5.5.7 prefer
+```
+
