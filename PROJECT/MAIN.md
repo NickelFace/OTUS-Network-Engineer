@@ -273,19 +273,32 @@ interface Ethernet0/3
 
 #### DHCP SNooping 
 
+Это функция коммутатора, предназначенная для защиты от атак с использованием протокола DHCP.
+
 **AccSW1**
 
 ```
+Помечаем порты как доверенные , с них мы можем ожидать Offer от DHCP сервера. А остальные по умолчанию заблокированы от принятия DHCP запроса с предложением .
+
 interface Ethernet0/0
- switchport trunk allowed vlan 2,20
- switchport trunk encapsulation dot1q
- switchport mode trunk
  ip dhcp snooping trust
          
 interface Ethernet0/1
- switchport trunk allowed vlan 2,20
- switchport trunk encapsulation dot1q
- switchport mode trunk
  ip dhcp snooping trust
+ 
+Задаём команду глобально и отдельно за каждый VLAN
+ip dhcp snooping 
+ip dhcp snooping vlan 2
+no ip dhcp snooping information option // Убирает 82 опцию с запроса
+ip dhcp relay information trust-all // таким образом указывается доверенный DHCP сервер, который находится вне канальной среды. 
+ 
+Проблема в том ,что после указания dhcp snooping vlan 2 (за любой vlan) , коммутатор к dhcp Discover добавляет 82 опцию и такой кадр попадает на уровень Distribution и далее дропается. Поэтому мы задаем данной командой запрет на подобное поведение.
+
+Ограничем количество генерируемых DHCP запросов на определенный порт
+interface Ethernet0/2
+ ip dhcp snooping limit rate 10
+         
+interface Ethernet0/3
+ ip dhcp snooping limit rate 10
 ```
 
