@@ -6,13 +6,13 @@
 
 ## Разбиваем на части :
 
-1. Адресация сети предприятия
-2. OSPF и проверка связности
-3. Создание VLAN , работа с HSRP и STP.
-4.  DHCP , а также настройка L2 Security 
-5. FTP , AAA server (Tacacs+) , 3 Distribution block , ISP, PAT
+1. <a name="1">Адресация сети предприятия</a>
+2. <a name="2">OSPF и проверка связности</a>
+3. <a name="3">Создание VLAN , работа с HSRP и STP.</a>
+4.  <a name="4">DHCP , а также настройка L2 Security </a>
+5. <a name="5">FTP , AAA server (Tacacs+) , 3 Distribution block , ISP, PAT</a>
 
-### Адресация сети предприятия
+### [Адресация сети предприятия](#1)
 
 Из частного диапазона адресов ,была выбрана:
 
@@ -49,9 +49,9 @@
 
 Всё что ниже этих устройств это L2 , всё что выше этих устройств  L3.
 
-#### STP
+#### [STP](#3)
 
-Для первых 2х блоков и перехода в L3  использовался протокол резервирования первого перехода - **GLBP**. И первая проблема , с которой столкнулся , это STP , а точнее PVST , который строит дерево за каждый VLAN. Проблема том, что STP блокирует порты , и вследствии чего , трафик  идет через  Access коммутатор , нарушая идеалогию иерархического построения сети.
+Для первых 2х блоков и перехода в L3  использовался протокол резервирования первого перехода - **HSRP**. И первая проблема , с которой столкнулся , это STP , а точнее PVST , который строит дерево за каждый VLAN. Проблема том, что STP блокирует порты , и вследствии чего , трафик  идет через  Access коммутатор , нарушая идеалогию иерархического построения сети.
 
 За первый блок D-SW1 и D-SW2 у нас 3 домена трафика : VLAN 2, 3, 20. (VLAN 2 и VLAN 3 для работы пользователей ,а 20 для управления устройствами.)
 
@@ -72,42 +72,27 @@
 **D-SW1**
 
 ```
-Установим root за каждый Vlan 
-D-SW1(config)#spanning-tree vlan 2 root primary 
-D-SW1(config)#spanning-tree vlan 20 root primary 
-D-SW1(config)#spanning-tree vlan 3 root secondary 
+Установим root за каждый Vlan:
 
-Также был организован Etherchannel ,чтобы трафик ходил иерархично + этим была организована отказоустойччивость
-
-interface Ethernet1/0
- switchport trunk encapsulation dot1q
- channel-group 1 mode desirable
-!         
-interface Ethernet1/1
- switchport trunk encapsulation dot1q
- channel-group 1 mode desirable
-
-interface Port-channel1
- switchport trunk encapsulation dot1q
- 
-port-channel load-balance src-dst-mac
+spanning-tree vlan 2,20 priority 24576
+spanning-tree vlan 3 priority 28672
 
 Ограничивать конкретными Vlan не стал ,по причине того,что обычно доступ к D-SW ограничен помещением,который закрывается на ключ.
  
-Настройка GLBP за каждый Vlan +  ip helper-address для направния запросов на DHCP сервер, который может находиться за несколько канальных сред.
+Настройка HSRP за каждый Vlan +  ip helper-address для направния запросов на DHCP сервер, который может находиться за несколько канальных сред.
 
 interface Vlan2
  ip address 172.16.2.251 255.255.255.0
  ip helper-address 5.5.5.11
- glbp 0 ip 172.16.2.1
- glbp 0 priority 150
- glbp 0 preempt
+ standby 0 ip 172.16.2.1
+ standby 0 priority 150
+ standby 0 preempt
  
  interface Vlan3
  ip address 172.16.3.251 255.255.255.0
  ip helper-address 5.5.5.11
- glbp 0 ip 172.16.3.1
- glbp 0 preempt
+ standby 0 ip 172.16.3.1
+ standby 0 preempt
  
 Также на каждом устройстве который учавствует в OSPF и работает с IP был назначен Loopback адрес:
  
@@ -117,7 +102,7 @@ interface Loopback0
 
 Аналогичная настройка присутствует на остальных L3 Switch уровня Distribution.
 
-### OSPF и проверка связности
+### [OSPF и проверка связности](#2)
 
 Далее было прописан адрес на каждом интерфейсе Router  или Switch L3 в режиме роутера. И организован протокол динамической маршрутизации OSPF .
 
@@ -152,7 +137,7 @@ interface Ethernet1/3
 
 На этом этапе была проведено тестирование оборудования на отказоустойчивость и на скорость сходимости в случае сбоя.
 
-### DHCP и L2 Security
+### [DHCP и L2 Security](#4)
 
 ![](img/Corporate.png)
 
@@ -340,7 +325,7 @@ interface Ethernet0/3
  ip arp inspection limit rate 2
 ```
 
-###  ISP и выход в интернет, PAT , FTP , 3 Distribution block (Server Farm) , NTP
+###  [ISP и выход в интернет, PAT , FTP , 3 Distribution block (Server Farm) , NTP](#5)
 
 ![](img/DistributionBlock3.png)
 
@@ -392,7 +377,7 @@ interface Ethernet1/3
 
 Также на каждом блоке организован **Etherchannel** :
 
-#### PAgP
+#### LACP
 
 ```
 interface Port-channel1
@@ -402,16 +387,16 @@ interface Port-channel1
 interface Ethernet1/0
  switchport trunk encapsulation dot1q
  switchport mode trunk
- channel-group 1 mode desirable
+ channel-group 1 mode active
 !         
 interface Ethernet1/1
  switchport trunk encapsulation dot1q
  switchport mode trunk
- channel-group 1 mode desirable
+ channel-group 1 mode active
  
  port-channel load-balance src-dst-mac
 -------------------------------------------------------------------------------- 
-FarmDistSW1# show etherchannel summary 
+D-SW4#show etherchannel summary
 Flags:  D - down        P - bundled in port-channel
         I - stand-alone s - suspended
         H - Hot-standby (LACP only)
@@ -429,12 +414,14 @@ Number of aggregators:           1
 
 Group  Port-channel  Protocol    Ports
 ------+-------------+-----------+-----------------------------------------------
-1      Po1(SU)         PAgP      Et1/0(P)    Et1/1(P)    
+1      Po1(SU)         LACP      Et1/0(P)    Et1/1(P)
 ```
 
 #### **FTP**
 
 Пропишем на всех устройствах доступ к FTP серверу 
+
+Где логин: admin , password: cisco
 
 ```
 archive   
