@@ -236,15 +236,13 @@ interface Ethernet0/2
  switchport mode access
  switchport port-security maximum 10
  switchport port-security mac-address sticky
- switchport port-security mac-address sticky 0050.7966.681e
  switchport port-security
 !         
 interface Ethernet0/3
- switchport access vlan 2
+ switchport access vlan 10
  switchport mode access
- switchport port-security maximum 10
+ switchport port-security maximum 2
  switchport port-security mac-address sticky
- switchport port-security mac-address sticky 0050.7966.681d
  switchport port-security
 ```
 
