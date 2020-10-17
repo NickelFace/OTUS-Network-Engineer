@@ -1,6 +1,6 @@
 # Protocol IS-IS
 
-![image-20201017144147744](C:\Users\admin\Documents\GitHub\OTUS_Network\IS-IS\img\1.png)
+![1](img/1.png)
 
 
 
