@@ -60,7 +60,7 @@ ip ssh version 1
 !
 !
 !
-interface FastEthernet0/0
+interface Ethernet0/0
  ip address 50.0.2.2 255.255.255.0
  duplex auto
  speed auto
@@ -70,12 +70,12 @@ interface Serial0/0
  shutdown
  clock rate 2000000
 !
-interface FastEthernet0/1
+interface Ethernet0/1
  ip address 50.0.1.2 255.255.255.0
  duplex auto
  speed auto
 !
-interface FastEthernet1/0
+interface Ethernet1/0
  ip address 192.168.1.1 255.255.255.0
  duplex auto
  speed auto
@@ -186,7 +186,7 @@ interface Loopback1
  ip nat inside
  ip virtual-reassembly
 !
-interface FastEthernet0/0
+interface Ethernet0/0
  ip address 50.0.2.1 255.255.255.0
  ip nat inside
  ip virtual-reassembly
@@ -198,14 +198,14 @@ interface Serial0/0
  shutdown
  clock rate 2000000
 !
-interface FastEthernet0/1
+interface Ethernet0/1
  ip address 132.56.43.22 255.255.255.0
  ip nat outside
  ip virtual-reassembly
  duplex auto
  speed auto
 !
-interface FastEthernet1/0
+interface Ethernet0/2
  ip address 50.0.3.2 255.255.255.0
  ip nat inside
  ip virtual-reassembly
@@ -348,7 +348,7 @@ interface Loopback1
  ip nat inside
  ip virtual-reassembly
 !
-interface FastEthernet0/0
+interface Ethernet0/0
  ip address 218.56.78.89 255.255.255.0
  ip nat outside
  ip virtual-reassembly
@@ -360,14 +360,14 @@ interface Serial0/0
  shutdown
  clock rate 2000000
 !
-interface FastEthernet0/1
+interface Ethernet0/1
  ip address 50.0.1.1 255.255.255.0
  ip nat inside
  ip virtual-reassembly
  duplex auto
  speed auto
 !
-interface FastEthernet1/0
+interface Ethernet1/0
  ip address 50.0.3.1 255.255.255.0
  duplex auto
  speed auto
@@ -497,7 +497,7 @@ interface Loopback2
 interface Loopback3
  ip address 155.78.65.7 255.255.255.0
 !
-interface FastEthernet0/0
+interface Ethernet0/0
  ip address 10.0.2.2 255.255.255.0
  duplex auto
  speed auto
@@ -507,12 +507,12 @@ interface Serial0/0
  shutdown
  clock rate 2000000
 !
-interface FastEthernet0/1
+interface Ethernet0/1
  ip address 132.56.43.21 255.255.255.0
  duplex auto
  speed auto
 !
-interface FastEthernet1/0
+interface Ethernet1/0
  no ip address
  shutdown
  duplex auto
@@ -626,7 +626,7 @@ ip ssh version 1
 !
 !
 !
-interface FastEthernet0/0
+interface Ethernet0/0
  ip address 218.56.78.88 255.255.255.0
  duplex auto
  speed auto
@@ -636,12 +636,12 @@ interface Serial0/0
  shutdown
  clock rate 2000000
 !
-interface FastEthernet0/1
+interface Ethernet0/1
  ip address 10.0.1.2 255.255.255.0
  duplex auto
  speed auto
 !
-interface FastEthernet1/0
+interface Ethernet1/0
  no ip address
  shutdown
  duplex auto
@@ -751,7 +751,7 @@ ip ssh version 1
 !
 !
 !
-interface FastEthernet0/0
+interface Ethernet0/0
  ip address 10.0.2.1 255.255.255.0
  duplex auto
  speed auto
@@ -761,12 +761,12 @@ interface Serial0/0
  shutdown
  clock rate 2000000
 !
-interface FastEthernet0/1
+interface Ethernet0/1
  ip address 10.0.1.1 255.255.255.0
  duplex auto
  speed auto
 !
-interface FastEthernet1/0
+interface Ethernet1/0
  ip address 8.8.8.1 255.255.255.0
  duplex auto
  speed auto
