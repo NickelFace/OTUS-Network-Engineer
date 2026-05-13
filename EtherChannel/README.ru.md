@@ -1,3 +1,5 @@
+[🇬🇧 English version](README.md)
+
 ## Лабораторная работа. Настройка EtherChannel
 
 ### Топология
@@ -232,3 +234,7 @@ show etherchannel summary
 show etherchannel 1 port-channel
 show interfaces etherchannel
 ```
+
+---
+
+[← 02. STP](../STP/) | [🏠 Главная](../README.md) | [03. EtherChannel TS →](Troubleshooting.ru.md)

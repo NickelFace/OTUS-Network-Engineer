@@ -1,3 +1,5 @@
+[🇬🇧 English version](DMVPN-IPSec.md)
+
 # IPsec
 
 ![](img/EVE_Topology.png)
@@ -280,3 +282,6 @@ Success rate is 100 percent (5/5), round-trip min/avg/max = 7/7/8 ms
 ### План работы и изменения зафиксированы в документации
 
 https://1drv.ms/u/s!AiW_chHQt5JCg64XQ0nBMdjjoQ3bLw?e=B1LOJE
+---
+
+[← 15. DMVPN](DMVPN.ru.md) | [🏠 Главная](../README.md) | [17. Проект →](../PROJECT/)

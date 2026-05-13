@@ -1,35 +1,39 @@
-# Маршрутизация на основе политик (PBR)
+[🇷🇺 Русская версия](PBR.ru.md)
 
-## Домашнее задание
 
-### PBR
+## Policy-Based Routing (PBR)
 
-Цель: Настроить политику маршрутизации в офисе Чокурдах Распределить трафик между 2 линками
+### Assignment
 
-  В этой  самостоятельной работе мы ожидаем, что вы самостоятельно:
+Goal: Configure routing policy for the Chokurdakh office and distribute traffic between 2 uplinks.
 
-1. Настроите политику маршрутизации для сетей офиса Чокурдах
-2. Распределите трафик между двумя линками с провайдером в Чокурдах
-3. Настроите отслеживание линка через технологию IP SLA в Чокурдах
-4. Настройте для офиса Лабытнанги маршрут по-умолчанию
-5. План работы и изменения зафиксированы в документации 
+In this lab you are expected to independently:
 
-![PBR](img/PBR.png)
+1. Configure routing policy for the Chokurdakh office networks
+2. Distribute traffic between the two provider uplinks in Chokurdakh
+3. Configure link tracking via IP SLA in Chokurdakh
+4. Configure a default route for the Labytnangi office
+5. Document the plan and changes
 
-| Устройств | Port | IPv4             | IPv6                 | Примечание      | Регион     |
-| --------- | ---- | ---------------- | -------------------- | --------------- | ---------- |
-| R27       | e0/0 | 210.110.35.2/30  | 2CAD:1995:B0DA:A::27 | R25(Triada)     | Лабытнанги |
-| R28       | e0/0 | 111.110.35.14/30 | 2CAD:1995:B0DA:7::28 | R26(Triada)     | Чокурдах   |
-|           | e0/1 | 111.110.35.10/30 | 2CAD:1995:B0DA:8::28 | R25(Triada)     |            |
-|           | e0/2 | 172.16.40.1/24   | 2CAD:1995:B0DA:9::28 | SW29(Chukordah) |            |
-| VPC30     |      | 172.16.40.10     | 2cad:1995:b0da:9::10 |                 |            |
-| VPC31     |      | 172.16.40.11     | 2cad:1995:b0da:9::11 |                 |            |
+> **Note:** `verify-availability` in route-map may not work for IPv6.
 
-## Настроите политику маршрутизации для сетей офиса Чокурдах
+![PBR](/img/neteng/08/1.png)
 
-**R28**
+| Device | Port | IPv4             | IPv6                 | Note            | Region     |
+| ------ | ---- | ---------------- | -------------------- | --------------- | ---------- |
+| R27    | e0/0 | 210.110.35.2/30  | 2CAD:1995:B0DA:A::27 | R25(Triada)     | Labytnangi |
+| R28    | e0/0 | 111.110.35.14/30 | 2CAD:1995:B0DA:7::28 | R26(Triada)     | Chokurdakh |
+|        | e0/1 | 111.110.35.10/30 | 2CAD:1995:B0DA:8::28 | R25(Triada)     |            |
+|        | e0/2 | 172.16.40.1/24   | 2CAD:1995:B0DA:9::28 | SW29(Chokurdah) |            |
+| VPC30  |      | 172.16.40.10     | 2cad:1995:b0da:9::10 |                 |            |
+| VPC31  |      | 172.16.40.11     | 2cad:1995:b0da:9::11 |                 |            |
 
-```
+
+## Configure routing policy for the Chokurdakh office networks
+
+<details>
+<summary>R28 — interface addresses</summary>
+<pre><code>
 R28#show ipv6 int brief
 Ethernet0/0            [up/up]
     FE80::A8BB:CCFF:FE01:C000
@@ -40,70 +44,77 @@ Ethernet0/1            [up/up]
 Ethernet0/2            [up/up]
     FE80:21::28
     2CAD:1995:B0DA:9::28
-    
+
 R28#show ip int bri
 Interface                  IP-Address      OK? Method Status                Protocol
 Ethernet0/0                111.110.35.14   YES manual up                    up
 Ethernet0/1                111.110.35.10   YES manual up                    up
 Ethernet0/2                172.16.40.1     YES manual up                    up
+</code></pre>
+</details>
 
-```
 
-Со стороны провайдера не вижу смысла показывать 
+## Distribute traffic between the two provider uplinks in Chokurdakh
 
-## Распределите трафик между двумя линками с провайдером в Чокурдах
+ACL `ACL1` matches traffic from VPC30 (172.16.40.10) and the route-map steers it via R26 (e0/0). A static route to R25's loopback (215.215.215.215) is added to verify the alternate path — the provider side runs OSPF with no additional configuration required.
 
-**R28**
-
-```
-enbale
+<details>
+<summary>R28</summary>
+<pre><code>
+enable
 configure terminal
 
-На R25  мы поднимаем Loopback сеть и указываем маршрут до них
-А на стороне провайдера работает OSPF ,там я ничего не прописывал ,кроме анонса сети.
 ip route 215.215.215.215 255.255.255.255 111.110.35.9
-
 
 ip access-list extended ACL1
  permit ip host 172.16.40.10 any
 
 route-map TEST permit 10
  match ip address ACL1
- set ip next-hop 111.110.35.13 
+ set ip next-hop 111.110.35.13
  set ipv6 next-hop 2CAD:1995:B0DA:7::26
 
- 
 interface Ethernet0/2
  ip policy route-map TEST
+end
+copy running-config startup-config
+</code></pre>
+</details>
 
-```
+VPC30 trace before and after applying the route-map:
 
-**VPC30**
-
-```
-До применения Route-map
-
+<details>
+<summary>VPC30</summary>
+<pre><code>
+enable
+configure terminal
+! Before route-map
 VPCS> trace 215.215.215.215
 trace to 215.215.215.215, 8 hops max, press Ctrl+C to stop
  1   172.16.40.1   0.551 ms  0.369 ms  0.357 ms
  2   *111.110.35.9   1.014 ms (ICMP type:3, code:3, Destination port unreachable)  *
 
-После применения Route-map
-
+! After route-map
 VPCS> trace 215.215.215.215
 trace to 215.215.215.215, 8 hops max, press Ctrl+C to stop
  1   172.16.40.1   0.629 ms  0.560 ms  0.463 ms
  2   111.110.35.13   0.902 ms  0.655 ms  0.590 ms
  3   *10.10.30.9   0.882 ms (ICMP type:3, code:3, Destination port unreachable)  *
-```
+end
+copy running-config startup-config
+</code></pre>
+</details>
 
 
+## Configure link tracking via IP SLA in Chokurdakh
 
-## Настроите отслеживание линка через технологию IP SLA в Чокурдах
+Two IP SLA probes monitor reachability to each provider next-hop. Tracked objects are referenced in both the default routes and the route-map:
 
-**R28**
-
-```
+<details>
+<summary>R28</summary>
+<pre><code>
+enable
+configure terminal
 ip sla 1
  icmp-echo 111.110.35.9 source-interface Ethernet0/1
  frequency 5
@@ -120,19 +131,19 @@ track 2 ip sla 2 reachability
 ip route 0.0.0.0 0.0.0.0 111.110.35.9 track 1
 ip route 0.0.0.0 0.0.0.0 111.110.35.13 track 2
 
-------------------------------------------------------------------------------
-Немного переделаем Route-map с проверкой
-
+! Updated route-map with availability verification
 route-map TEST permit 10
  match ip address ACL1
  set ip next-hop verify-availability 111.110.35.9 10 track 1
  set ip next-hop verify-availability 111.110.35.13 15 track 2
+end
+copy running-config startup-config
+</code></pre>
+</details>
 
-```
-
-Проверка Track и Route-map
-
-```
+<details>
+<summary>R28 — show track / show route-map</summary>
+<pre><code>
 R28#show track 1
 Track 1
   IP SLA 1 reachability
@@ -143,7 +154,6 @@ Track 1
   Tracked by:
     ROUTE-MAP 0
     STATIC-IP-ROUTING 0
-
 
 R28#show track 2
 Track 2
@@ -156,7 +166,6 @@ Track 2
     ROUTE-MAP 0
     STATIC-IP-ROUTING 0
 
-
 R28#show route-map
 route-map TEST, permit, sequence 10
   Match clauses:
@@ -166,25 +175,28 @@ route-map TEST, permit, sequence 10
     ip next-hop verify-availability 111.110.35.13 15 track 2  [up]
      ipv6 next-hop 2CAD:1995:B0DA:7::26
   Policy routing matches: 234 packets, 24284 bytes
-```
+</code></pre>
+</details>
 
 
+## Configure a default route for the Labytnangi office
 
-## Настройте для офиса Лабытнанги маршрут по-умолчанию
-
-**R27**
-
-```
+<details>
+<summary>R27</summary>
+<pre><code>
+enable
+configure terminal
 R27(config)#do sh run | s route
 ip route 0.0.0.0 0.0.0.0 210.110.35.1
 ipv6 route ::/0 2CAD:1995:B0DA:A::25
-```
+end
+copy running-config startup-config
+</code></pre>
+</details>
 
 
+*Network Engineer Course | Lab 08*
 
+---
 
-
-
-
-
-
+[← 07. IPv4/IPv6](IPv4-IPv6.md) | [🏠 Home](../README.md) | [09. OSPF Filter →](OSPF-Filter.md)

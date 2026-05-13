@@ -1,3 +1,5 @@
+[🇬🇧 English version](Troubleshooting.md)
+
 ## Лабораторная работа. Поиск и устранение неполадок в работе EtherChannel
 
 
@@ -260,3 +262,7 @@ Ping с ПК А на С тоже идут ,  а это значит, что с �
 
 
 
+
+---
+
+[← EtherChannel](README.ru.md) | [🏠 Главная](../README.md) | [03. HSRP →](HSRP.ru.md)

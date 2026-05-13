@@ -1,104 +1,156 @@
-## Лабораторная работа. Настройка расширенных сетей VLAN, VTP и DTP
+[🇷🇺 Русская версия](README.ru.md)
 
-#### Топология
+## Lab 01 — Configuring Extended VLAN, VTP and DTP
 
-![img](img/1.jpg)
+#### Topology
 
-#### Таблица адресации
+![Topology](img/VLAN.png)
 
-| Заголовок таблицы | Интерфейс | IP-адрес     | Маска подсети |
-| ----------------- | --------- | ------------ | ------------- |
-| S1                | VLAN 99   | 192.168.99.1 | 255.255.255.0 |
-| S2                | VLAN 99   | 192.168.99.2 | 255.255.255.0 |
-| S3                | VLAN 99   | 192.168.99.3 | 255.255.255.0 |
-| PC-A              | NIC       | 192.168.10.1 | 255.255.255.0 |
-| PC-B              | NIC       | 192.168.20.1 | 255.255.255.0 |
-| PC-C              | NIC       | 192.168.10.2 | 255.255.255.0 |
+#### Addressing table
 
- 
+| Device | Interface | IP address   | Subnet Mask   |
+| ------ | --------- | ------------ | ------------- |
+| S1     | VLAN 99   | 192.168.99.1 | 255.255.255.0 |
+| S2     | VLAN 99   | 192.168.99.2 | 255.255.255.0 |
+| S3     | VLAN 99   | 192.168.99.3 | 255.255.255.0 |
+| PC-A   | NIC       | 192.168.10.1 | 255.255.255.0 |
+| PC-B   | NIC       | 192.168.20.1 | 255.255.255.0 |
+| PC-C   | NIC       | 192.168.10.2 | 255.255.255.0 |
 
-#### **Домашнее задание**
+#### Goals
 
-##### VLAN
+**Goal:** Setting up VTP, Setting up DTP, Adding VLANs and Assigning Ports, Setting up an Extended VLAN
 
-**Цель:** Настройка VTP Настройка DTP Добавление сетей VLAN и назначение портов Настройка расширенной сети VLAN 
+All switches use VTP for VLAN updates. S2 is configured as VTP server, S1 and S3 as clients.  
+Part 4 switches S1 to VTP transparent mode and creates an extended-range VLAN.
 
-В этой лабораторной работе вы настроите магистральные каналы между этими коммутаторами
- Все коммутаторы будут настроены на использование VTP для обновлений сетей VLAN. S2 будет настроен в качестве сервера. 
- Настройка динамического протокола транкинга (DTP)
- Добавление сетей VLAN и назначение портов
- В 4 части вам предстоит перевести VTP на коммутаторе S1 в прозрачный режим и создать сеть VLAN расширенного диапазона на коммутаторе S1.
+#### Part 1 — Basic device setup
 
-#### Создание сети и настройка основных параметров устройства:
+<details>
+<summary>S1</summary>
+<pre><code>
+enable
+configure terminal
+interface vlan 1
+ip address 192.168.1.1 255.255.255.0
+no shutdown
+exit
+hostname S1
+do copy run start
+</code></pre>
+</details>
+<details>
+<summary>S2</summary>
+<pre><code>
+enable
+configure terminal
+interface vlan 1
+ip address 192.168.1.2 255.255.255.0
+no shutdown
+exit
+hostname S2
+do copy run start
+</code></pre>
+</details>
+<details>
+<summary>S3</summary>
+<pre><code>
+enable
+configure terminal
+interface vlan 1
+ip address 192.168.1.3 255.255.255.0
+no shutdown
+exit
+hostname S3
+do copy run start
+</code></pre>
+</details>
 
-1. Создать сеть согласно топологии(уже соединил согсно схеме)
+Disable DNS lookup, set passwords, enable logging synchronous:
 
-    **S1 :** Enable – Configure terminal – interface vlan 1 – ip address 192.168.1.1 255.255.255.0 – no shutdown – exit - hostname S1 – do copy run start – [Enter] 
+<details>
+<summary>S1, S2, S3</summary>
+<pre><code>
+no ip domain-lookup
+enable secret cisco
+line console 0
+password cisco
+login
+logging synchronous
+banner motd "** This is a secure system. Authorized Access Only!"
+</code></pre>
+</details>
 
-   **S2 :** Enable – Configure terminal – interface vlan 1 – ip address 192.168.1.2 255.255.255.0 – no shutdown – exit -  Hostname S2 – do copy run start – [Enter]
+#### Part 2 — VTP configuration
 
-   **S3 :** Enable – Configure terminal – interface vlan 1 – ip address 192.168.1.3 255.255.255.0 – no shutdown – exit - Hostname S3 – do copy run start – [Enter]
+<details>
+<summary>S2 (VTP Server)</summary>
+<pre><code>
+vtp domain CCNA
+vtp password cisco
+vtp version 3
+vtp mode server
+end
+vtp primary server force
+</code></pre>
+</details>
+<details>
+<summary>S1, S3 (VTP Client)</summary>
+<pre><code>
+vtp domain CCNA
+vtp password cisco
+vtp version 3
+vtp mode client
+</code></pre>
+</details>
 
-2. Чтобы отключить поиск по DNS на каждом коммутаторе прописываем
+#### Part 3 — DTP / Trunk setup
 
-  * no ip domain-lookup в режиме конфигурации*
+<details>
+<summary>S1, S2, S3</summary>
+<pre><code>
+interface Ethernet0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+interface Ethernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+</code></pre>
+</details>
 
-3. В режиме конфигурации пропишем : пароль на расширенный режим, и на вход устройства ,а также синхронизацию CLI . 
+Verify: `show interfaces trunk`
 
-   **S1 :** enable secret class – line console 0 – password cisco – login - logging synchronous
-    **S2 :** enable secret class – line console 0 – password cisco – login - logging synchronous 
-    **S3 :** enable secret class – line console 0 – password cisco – login - logging synchronous
+#### Part 4 — Create VLANs on S2 (server)
 
-4. Настроим баннер при входе, при входе на устройство 
+<details>
+<summary>S2</summary>
+<pre><code>
+vlan 999
+ name VTP_Lab
+vlan 10
+ name Red
+vlan 20
+ name Blue
+vlan 30
+ name Yellow
+vlan 99
+ name Management
+</code></pre>
+</details>
 
-   **S1,S2,S3:** Banner motd “**This is a secure system. Authorized Access Only!”**
+Verify propagation: `show vlan brief` on S1 and S3.
 
-5. Заводим протокол VTP на коммутаторы
-   
-   **S1 :** vtp domain CCNA – vtp password cisco – vtp version 3 – vtp mode client 
-   
+#### Part 5 — Extended VLAN on S1 (transparent mode)
 
-**S2 :** vtp domain CCNA – vtp password cisco – vtp version 3 – vtp mode server – end – vtp primary server force
+<details>
+<summary>S1</summary>
+<pre><code>
+vtp mode transparent
+vlan 2000
+ name Extended_VLAN
+</code></pre>
+</details>
 
-   **S3 :** vtp domain CCNA – vtp password cisco – vtp version 3 – vtp mode client
+---
 
-6. Переведем порты в режим TRUNK для того,чтобы работал протокол VTP
-
-   **S1 :** interface  FastEthernet 0/3– switchport trunk encapsulation dot1q – switchport mode trunk
-
-   **S1:** interface FastEthernet 0/1 – switchport trunk encapsulation dot1q – switchport mode dynamic desirable – do show interface trunk vtp
-
-   ![img](img/2.jpg)
-
-   **S2 :** interface FastEthernet 0/1 – switchport trunk encapsulation dot1q – switchport mode trunk
-
-   **S2 :** interface FastEthernet 0/3 – switchport trunk encapsulation dot1q – switchport mode trunk
-
-   **S3:** interface FastEthernet 0/3 – switchport trunk encapsulation dot1q – switchport mode trunk
-
-   **S3:** interface FastEthernet 0/1 – switchport trunk encapsulation dot1q – switchport mode trunk
-
-7. В **S2** заведем VLAN
-
-![img](img/2.jpg)
-
-
-    **S2:** vlan 999 – name VTP_Lab – : vlan 10 – name Red – vlan 20 – name Blue –vlan 30 –name Yellow – vlan 99 –name Management  
-    
-    Проверяем на остальных коммутаторах :
-    
-    S1: do show vlan brief
-
-   ![img](img/3.jpg) 
-
-   S3: : do show vlan brief
-
-![img](img/4.jpg)
-
-8. Проверим утилитой  ping  связанность ПК A-C
-
-   ![img](img/5.jpg)
-
- Со  Switch 2 проверим связанность со всеми коммутаторами
-
- ![img](img/6.jpg)
+← *Start* | [🏠 Home](../README.md) | [02. STP →](../STP/)

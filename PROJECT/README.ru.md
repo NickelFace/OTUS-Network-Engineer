@@ -1,3 +1,5 @@
+[🇬🇧 English version](README.md)
+
 # «Организация сети офиса»
 
 ![](img/Corporate.png)
@@ -448,3 +450,7 @@ ntp server 5.5.5.8
 ntp server 5.5.5.7 prefer
 ```
 
+
+---
+
+[← 16. IPSec over DMVPN](../Diplom/DMVPN-IPSec.ru.md) | [🏠 Главная](../README.md) | ← *Конец*
