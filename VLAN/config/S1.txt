@@ -1,0 +1,32 @@
+Enable
+Configure terminal
+
+no ip domain-lookup
+enable secret cisco
+line console 0
+password cisco
+login 
+logging synchronous
+banner motd “**This is a secure system. Authorized Access Only!**"'b'
+
+interface vlan 99
+ip address 192.168.99.1 255.255.255.0
+no shutdown
+exit
+hostname S1
+
+vtp domain CCNA
+vtp password cisco
+vtp version 3
+vtp mode client
+
+interface  Ethernet 0/3
+switchport trunk encapsulation dot1q
+switchport mode dynamic desirable
+switchport mode trunk
+interface  Ethernet 0/1
+switchport trunk encapsulation dot1q
+switchport mode dynamic desirable
+switchport mode trunk
+
+do copy run start 

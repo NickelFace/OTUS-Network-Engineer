@@ -1,0 +1,51 @@
+Enable
+Configure terminal
+hostname R1
+interface Loopback0
+ no shutdown
+ ip address 209.165.200.225 255.255.255.252
+!
+interface Loopback1
+ no shutdown
+ ip address 192.168.1.1 255.255.255.0
+!
+interface Loopback2
+ no shutdown
+ ip address 192.168.2.1 255.255.255.0
+exit
+interface Serial1/0
+ no shutdown
+ ip address 192.168.12.1 255.255.255.252
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 Cisco123
+ serial restart-delay 0
+ clock rate 128000
+exit
+no ip domain-lookup
+enable secret class
+line vty 0 4
+logging synchronous
+password cisco
+login
+exit
+line con 0
+logging synchronous
+password cisco
+login
+Banner motd "This is a secure system. Authorized Access Only!"
+do wr
+router ospf 1
+ router-id 1.1.1.1
+ area 1 range 192.168.0.0 255.255.252.0
+ passive-interface Loopback1
+ passive-interface Loopback2
+ network 192.168.1.0 0.0.0.255 area 1
+ network 192.168.2.0 0.0.0.255 area 1
+ network 192.168.12.0 0.0.0.3 area 0
+ default-information originate
+exit
+ip route 0.0.0.0 0.0.0.0 loopback 0
+
+end
+clear ip ospf process
+wr

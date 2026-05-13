@@ -1,0 +1,39 @@
+Enable
+Configure terminal
+!
+no ip domain-lookup
+hos R2
+!
+interface Serial1/0
+ip address 10.1.1.2 255.255.255.252
+no shut
+!
+interface Serial1/1
+ip address 10.2.2.2 255.255.255.0
+clock rate 128000
+no shut
+!
+int lo0
+ip address 209.165.200.225 255.255.255.224
+exit
+!
+enable secret class
+line vty 0 4
+logging synchronous
+password cisco
+login
+line con 0
+exec-t 0 0
+exit
+!
+router ospf 1
+ router-id 2.2.2.2
+ network 10.1.1.0 0.0.0.3 area 0
+ network 10.2.2.0 0.0.0.3 area 0
+ default-information originate
+ip route 0.0.0.0 0.0.0.0 lo0
+exit
+!
+end
+!
+wr

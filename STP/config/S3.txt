@@ -1,0 +1,22 @@
+enable
+conf t
+host S3
+line con 0
+exec-t 0 0
+exit
+
+int vlan 1
+ip add 192.168.1.3 255.255.255.0
+no shut 
+
+int ran e0/0-3
+sw tr en d
+sw m tr
+
+no ip domain-lookup
+enable secret cisco
+line console 0
+password cisco
+login 
+logging synchronous
+banner motd “**This is a secure system. Authorized Access Only!**"'b'

@@ -1,0 +1,37 @@
+Enable
+Configure terminal
+!
+no ip domain-lookup
+hos R1
+!
+interface Serial1/0
+ip address 10.1.1.1 255.255.255.252
+clock rate 128000
+no shut
+!
+interface Ethernet0/0
+ip address 192.168.1.1 255.255.255.0
+standby 1 ip 192.168.1.254
+standby version 2
+standby 1 priority 150
+standby 1 preempt
+duplex full
+no shut
+!
+enable secret class
+line vty 0 4
+logging synchronous
+password cisco
+login
+line con 0
+exec-t 0 0
+exit
+!
+router ospf 1
+router-id 1.1.1.1
+network 10.1.1.0 0.0.0.3 area 0
+network 192.168.1.0 0.0.0.255 area 0
+exit
+end
+!
+wr
